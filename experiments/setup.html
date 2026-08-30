@@ -1,0 +1,572 @@
+<!-- Color-concept association experiment for online data collection -->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>AlienPrototypes-Online</title>
+        <!-- Load in the jspsych tools, plugins,and layout -->
+        <script src= "js/jspsych.js"></script>   
+        <script src= "js/jspsych-html-keyboard-response.js"></script>
+        <script src= "js/jspsych-html-button-response.js"></script>
+        <script src= "js/jspsych-image-keyboard-responseMAS.js"></script>
+        <script src = "js/jspsych-image-slider-responseKM.js"></script>
+        <script src = "js/jspsych-image-slider-response_InstrMAS.js"></script>
+        <script src = "js/jspsych-instructions.js"></script>
+        <script src = "serverComm.js" type="text/javascript"></script>
+        <script src = "js/jspsych-call-function.js" type="text/javascript"></script>
+       
+       
+        <script src = "js/jspsych-fullscreen.js"></script>
+       
+        <script src = "js/jspsych-survey-text.js"></script>
+        <script src = "js/jspsych-survey-multi-select.js"></script>   
+        <script src = "js/jspsych-survey-multi-selectMAS.js"></script>  
+        <script src = "js/jspsych-survey-multi-choice.js"></script>
+        <link href= "js/jspsychMAS.css" rel="stylesheet" type="text/css"></link>
+
+        <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" type="text/javascript"></script>  
+        <script type="text/javascript" src="data/ccratings_meta_pilot0.json"></script>  
+        <script src ="js/jspsych-html-slider-response.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
+        <style>
+        </style>
+    </head>
+    <body>          
+    </body> 
+
+
+<!--------------------- Here is where the experiment is created ------------------------------------------->
+    <script>
+
+window.onbeforeunload = function() {
+    return "If you leave or refresh the page, you will not be able to finish the experiment. Are you sure you want to leave?"; 
+      };
+
+
+var rgbToHex = function (rgb) { 
+  var hex = Number(rgb).toString(16);
+  if (hex.length < 2) {
+       hex = "0" + hex;
+  }
+  return hex;
+};
+
+var fullColorHex = function(r,g,b) {   
+  var red = rgbToHex(Math.round(255*r));
+  var green = rgbToHex(Math.round(255*g));
+  var blue = rgbToHex(Math.round(255*b));
+  return red+green+blue;
+
+};
+var subject_id = jsPsych.randomization.randomID(20);
+var url_str = jsPsych.data.urlVariables();
+
+if(url_str.id){
+var workerID = url_str.id;   
+} else {
+var workerID = subject_id;
+}
+
+// Dummy timeline
+    var timeline0 = [];
+
+// Create timeline variable //  
+    var timeline = []; 
+
+// Set background color to gray //
+    document.body.style.backgroundColor = "rgb(89.05,89.05,89.05)" 
+
+
+
+// Initial welcome screen
+var initial_screen = {
+                type: 'html-button-response',
+                stimulus: 'Welcome to our experiment!' +
+                '<p>At the bottom of this screen, you will see a button that says "Begin Experiment".'+
+                '<br>Please only click that button when you are ready to complete the 25 minute experiment in one sitting.</p>'+
+                '<p> Once you click that button, it will not be possible to restart the experiment.',
+                choices: ['Begin Experiment'] }
+  timeline0.push(initial_screen);
+
+
+
+  //Enter fullscreen mode- asks participants to press "continue" button to enter full screen
+    // ONCE PARTICIPANTS ENTER FULL SCREEN, THEIR ID IS RECORDED. 
+    timeline0.push({
+        type: 'fullscreen',
+        fullscreen_mode: true,  //change to true to turn on & false to turn off   
+        on_finish: function (){registration()} // Function to register subject ID
+        })
+
+
+ function registration(){
+   serverComm.register_subject(workerID, //workerID,
+        function(){ // If the subject has a unique id that has not been recorded, the experiment will load/begin.
+            register_success(); //calls the entire experiment to begin 
+        },
+        function(){ // If ID has already been registered, give error message. 
+            document.querySelector('body').innerHTML = '<p>Our records indicate that you have already started this experiment. Due to the nature of the experiment, restarting is not permitted.</p><p>If you believe this message is in error, you can contact the researchers at kmukherjee2@wisc.edu.</p><p>Our apologies for the trouble.</p>';
+        },
+        function(){ // If there is a technical error. 
+            document.querySelector('body').innerHTML = '<p>Our apologies. There was a technical error on our end while loading the experiment.</p><p>You will not be able to complete the experiment. You can contact the researchers at kmukherjee2@wisc.edu with any questions.</p><p> Our apologies for the trouble.</p>';
+        })  }     
+
+
+
+
+function register_success (){
+
+
+
+
+jsPsych.data.addProperties({
+  subject_id: subject_id,
+  workerID: workerID
+});
+
+
+var assigned_condition = null;
+var n_conditions = 6;
+// Choose a concept
+
+serverComm.assign_condition(subject_id, n_conditions,
+  function(response){
+    assigned_condition = response.assignedCondition;
+   
+    start_experiment();
+    },
+  function(){
+    document.querySelector('body').innerHTML = '<p> Our apologies. There was a technical error on our end while loading the experiment.</p><p>You will not be able to complete the experiment. We are sorry for the trouble. You can contact the researchers at kmukherjee2@wisc.edu with any questions.</p>';
+  });
+
+function start_experiment(){
+
+
+
+concept_list = Object.keys(concept_dict);
+concept = concept_list[assigned_condition];
+
+//get exemplars of concept-category
+
+exemplars =  concept_dict[concept];
+
+
+jsPsych.data.addProperties({
+  concept_category: concept,
+});
+
+
+// "Fake trial" for checking if experiment loaded correctly 
+var loadCheck = {
+                type: 'html-keyboard-response',
+                stimulus: "",
+                choices: jsPsych.NO_KEYS,
+                trial_duration: 10}    
+timeline.push(loadCheck);
+
+
+// Save the fake trial data to the server (this is done as a way to check that if there is not a full dataset for a registered ID, that the experiment loaded properly and the participant dropped out)
+timeline.push({
+    type: 'call-function',
+    func: function(){saveData(jsPsych.data.get())}
+    });
+   
+
+
+
+
+
+
+
+//Enter fullscreen mode- asks participants to press "continue" button to enter full screen 
+//timeline.push({
+//    type: 'fullscreen',
+    fullscreen_mode: true  //change to true to turn on & false to turn off
+//})
+
+
+   var consentSign = {
+        type: 'survey-multi-selectMAS',
+        questions: [
+            {prompt: "  <strong>UNIVERSITY OF WISCONSIN-MADISON</strong>" +
+            "  <br><strong>Research Participant Information and Consent Form</strong>" +
+            " <br><br><strong>Title of the Study:</strong> Investigating how observers perceive, interpret, and evaluate visual features in 2D scenes and 3D environments" +
+            " <br><br><strong>Principal Investigator:</strong> Karen B. Schloss (phone: 608-316-4495) (email: kschloss@wisc.edu)" +
+            "  <br><br><strong><u>DESCRIPTION OF THE RESEARCH</u></strong>" +
+            "  <br>You are invited to participate in a research study about how visual features influence the ability to perceive, interpret, navigate, and remember information in visual displays" +
+            "  <br><br>You have been asked to participate because you accepted the HIT on Amazon Mechanical Turk." +
+            "  <br><br>The purpose of the research is to understand principles by which people perceive, evaluate and interpret visual information (e.g., the meaning of parts of a scientific diagram)." +
+            "  <br><br>This study will include adults (at least 18 yrs) from who participate in Amazon Mechanical Turk HITs." +
+            "  <br><br>The research will be conducted on the electronic device that you are using." +
+            "  <br><br><strong><u>WHAT WILL MY PARTICIPATION INVOLVE?</u></strong>" +
+            "  <br>If you decide to participate in this research you will be presented with visual displays containing images and/or text and will be asked to make judgments about them. For example, you may see shapes and be asked how round they appear or view a graph with a legend and interpret information about the data in the graph. You will be asked to respond by making button presses on a keyboard/mouse. You may be asked to complete questionnaires about your expertise or educational level in a given domain (e.g., neuroscience) and questionnaires about what sorts of things you like/dislike. Finally, you may be asked to respond to questions about your experience during the experiment (e.g., how much you enjoyed the task)." +
+            "  <br><br>You will be asked to complete 2-6 surveys or tasks." +
+            "  <br><br>Your participation will last approximately 5 min - 60 min per session and will require 1 session." +
+            "  <br><br><strong><u>ARE THERE ANY RISKS TO ME?</u></strong>" +
+            "  <br>We don't anticipate any risks to you from participation in this study." +
+            "  <br><br><strong><u>ARE THERE ANY BENEFITS TO ME?</u></strong>" +
+            "  <br>We don't expect any direct benefits to you from participation in this study." +
+            "  <br><br><strong><u>WILL I BE COMPENSATED FOR MY PARTICIPATION?</u></strong>" +
+            "  <br>The amount of compensation depends on the length of the tasks: $0.10 for 5 min, $0.30 for 10 min, $0.60 for 15 min, $0.80 for 20 min, $1.50 for 30 min, $3.00 for 60 min. The compensation amount for this HIT, as specified in the HIT description, was pre-determined based on the amount of time it took previous participants to do similar tasks." +
+            "  <br><br>If you do withdraw prior to the end of the study, you will receive no compensation." +
+            "  <br><br><strong><u>HOW WILL MY CONFIDENTIALITY BE PROTECTED?</u></strong>" +
+            "  <br>Participant information will remain confidential. Neither your name or any other identifiable information will be recorded. Typically, group characteristics will be published, but datasets with individual responses may also be shared. In such cases, the data will not be linked to your name or other identifiable information." +
+            "  <br><br><strong><u>WHOM SHOULD I CONTACT IF I HAVE QUESTIONS?</u></strong>" +
+            "   <br>You may ask any questions about the research at any time. If you have questions about the research you can contact the Principal Investigator Karen B. Schloss at 608-316-4495." +
+            "   <br><br>If you are not satisfied with response of research team, have more questions, or want to talk with someone about your rights as a research participant, you should contact the Education and Social/Behavioral Science IRB Office at 608-263-2320." +
+            "  <br><br>Your participation is completely voluntary. If you decide not to participate or to withdraw from the study you may do so without penalty." +
+            "  <br><br>By clicking the box below, you confirm that you have read this consent form, had an opportunity to ask any questions about your participation in this research and voluntarily consent to participate. You may print a copy of this form for your records." +
+            "  <br><br>Please click the box below next to the text 'I consent' to give your informed consent to participate. " +
+            "   </p>",
+            options: ["<strong>I consent</strong>"],
+            horizontal: false,
+            required: true, 
+            name: 'Consent'},
+            ],
+            // preamble:  "Consent",
+        button_label: "Start",
+        };
+   timeline.push(consentSign); 
+
+
+// Overview instructions of experiment 
+var overview_instructions = {
+            type: 'html-button-response',
+            stimulus: 'Welcome! <p> This experiment involves two parts: demographic information followed by an experimental task.' +
+            '<p> It will take about 25 minutes to complete all parts.',
+            choices: ['Next']
+        }
+     timeline.push(overview_instructions);
+
+
+
+// Demographic questions 
+    // Gender and handedness
+    var gender_hand = {
+        type: 'survey-multi-select',
+        questions: [
+            {prompt: "Gender",
+            options: ["Male", "Female", "Other"],
+            horizontal: false,
+            required: true, 
+            name: 'Gender'},
+
+            {prompt: "Preferred hand",
+            options: ["Left", "Right"],
+            horizontal: false,
+            required: true, 
+            name: 'Hand'},
+        ],
+        preamble: "Please respond to the following questions.",
+        button_label: "Done",
+        randomize_question_order: false
+        }; 
+    timeline.push(gender_hand); 
+
+
+    // Race/ethnicity & hispanic
+    var race_eth = {
+        type: 'survey-multi-select',
+        questions: [
+            {prompt: "",
+            options: ["Caucasian", "Black", "Asian","Pacific Islander", "Other"],
+            horizontal: false,
+            required: true, 
+            name: 'Race/Ethnic'},
+
+            {prompt: "",
+            options: ["Hispanic or Latino", "Not Hispanic or Latino"],
+            horizontal: false,
+            required: true, 
+            name: 'Hispanic/Latino'},
+            ],
+        preamble: "Please select all that apply.",
+        button_label: "Done",
+        randomize_question_order: false
+        }; 
+    timeline.push(race_eth); 
+
+
+     // Age and language 
+    var age_lang_demo = {
+            type: 'survey-text',
+            questions: [
+                {prompt: "Age", name: 'Age', rows: "1", columns: "3", required: true,},
+                {prompt: "List all languages spoken", name: "Languages", rows: "6", columns: "60", required: true,}
+            ],
+            preamble: "Please answer the following questions.",
+            button_label: "Done",
+            randomize_question_order: false
+        }
+        timeline.push(age_lang_demo); 
+
+
+bd ="<p>This will change</p>\
+<p style='color:black;font-size:30px;line-height:1.2'>Objects<br>"+exemplars[0]+" "+exemplars[1]+" "+exemplars[2]+" "+exemplars[3]+" "+exemplars[4]+"</p>";
+bd += "<div>"
+for(i=0;i<58;i++){
+    this_col = fullColorHex(uw_58[i]['r'],uw_58[i]['g'],uw_58[i]['b'])
+
+    if(i%10==0){
+    bd += "<div>";
+}
+if(i==50){
+    bd +=  '<div style= "height:100px;width:100px;border-style: solid;border-width: 2px;float:left; margin: 10px 10px;border-color:#FFFFFF;display:inline-block;background:#FFFFFF></div>';
+   bd +=  '<div style= "height:100px;width:100px;border-style: solid;border-width: 2px;margin:10px 10px;float:left;border-color:#000000;display:inline-block;background:#'+this_col+'"></div>';
+    }
+   bd +=  '<div style= "height:100px;width:100px;border-style: solid;border-width: 2px;margin:10px 10px;float:left;border-color:#000000;display:inline-block;background:#'+this_col+'"></div>';
+   if((i+1)%10==0){
+    bd += "</div>";
+}
+   
+
+}
+bd += '</div></div><div><br><div style= "height:100px;width:100px;border-style: solid;border-width: 2px;margin:10px 10px;float:left;display:inline-block; border-color: white;background:#FFFFFF"></div></div>'
+
+var demo_completion = {
+        type: 'instructions',
+
+
+        pages: ["<p>Great job!</p> You have completed the consent process and answered the demographic questions."+
+            "<p> Press Next to continue.</p>",
+
+             "<p>During this experiment you will be presented with a colored square with a word above it. You will be asked to  \
+                rate how much you associate the color of the square with the word presented on a scale from 'Not at all' to 'Very much'. Here is an example of what a typical trial will look like:<br>\
+                <p style = 'font-size:30px;line-height:1.3;'><img src = 'demo.png' style='border: 2px solid #000000;'></img><p>  To respond, you may slide the cursor on the response scale by clicking on it and dragging it with your mouse.\
+                You will be presented with 5 words. First you will be asked to rate the associations between all colors and the first word, then all colors and the second word and so on. </p>" +bd,
+                "<p>Press 'Next' when you are ready to begin the experiment. Good luck!</p>"
+        ],
+
+
+
+        show_clickable_nav: true,
+        allow_backward:false,
+        allow_keys:false,
+
+      };
+ //timeline.push(demo_completion);
+
+
+
+var instructions = {
+                    type: 'image-slider-response_InstrMAS',  
+                    stimulus: "data/patches.png",
+                    //maintain_aspect_ratio: true,
+                    stimulus_height:700,
+                    labels: ['Not at all', 'Very Much'],
+                    concepts: exemplars,
+                    response_ends_trial: true,
+                    slider_width: 400,
+                    prompt1: "<div style ='text-align:left'><p><br>During this experiment you be presented with each of the colored squares from the set below, one at a time.<br>\
+                    You will be asked to rate how much you associate each color with each of the concepts to the left of the colors on a scale from 'not at all' to 'very much' like the one below.</p><p>To respond, slide the cursor along the response scale and click the mouse to record your response.<br>There will be 5 blocks of trials, one for each concept. You will be asked to rate all of the colors for each concept before going on to the next block.</p>"+
+                     "<br>Before starting, take a look at <b>all</b> the colors presented here and think about which color you associate the most (Very much) and least (Not at All) for each concept.<br>"+
+                    "Those colors represent the far ends of the rating scale, such that they would be rated on the far left/right and all other colors would be rated somewhere in-between for a given concept.<br>\
+                     <p>Press the 'Start' button when you're ready to begin.</p></div>",       
+                    require_movement: false, 
+                    require_movement: false, 
+                    step: 1,
+                    start: 0,
+                    min: -200,
+                    max: 200, 
+                    button_label: "Start"
+                    }
+    timeline.push(instructions); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Inter trial interval //
+    var fixation = {
+                type: 'html-keyboard-response',
+                stimulus: '<div style= "font-size:40px;">+</div>',
+                choices: jsPsych.NO_KEYS,
+                trial_duration: 500}    
+
+
+
+/* ---------------------------------------  Associations Ratings ------------------------ */
+
+
+
+//Generate order of colors
+
+
+for(i=0;i<exemplars.length;i++){
+
+    var color_order = jsPsych.randomization.sampleWithoutReplacement(_.range(Object.keys(uw_58).length), 58);
+       var block_break0 = {
+        type: "html-button-response",
+        stimulus:  "<p>In this block of trials, you will be asked to rate how much you associate each color with:</p> "+
+             "<p>"+exemplars[i]+"</p><br></br>",
+         choices: ['Continue'],   
+         };
+         timeline.push(block_break0);
+   
+
+
+    for(j=0;j<Object.keys(uw_58).length;j++){
+       
+
+
+        this_col = fullColorHex(uw_58[color_order[j]]['r'],uw_58[color_order[j]]['g'],uw_58[color_order[j]]['b'])
+
+     
+
+         // Ratings trial // 
+                    var rating_trial = {
+                    type: 'image-slider-responseMAS',  
+                    data: { color_rgb: this_col,
+                    concept: concept,
+                    time_finished: Date.now(),
+                    color_index:color_order[j]},
+                    stimulus: '<div style= "height:100px;width:100px;border:00px solid powderblue;display: inline-block;background:#'+this_col+'"></div>',
+
+
+
+                    stimulus_height: 80, 
+                    //stimulus_width: 100,
+                    maintain_aspect_ratio: true,
+                    labels: ['Not at all', 'Very Much'],
+                    response_ends_trial: true,
+                    slider_width: 400,
+                    prompt: exemplars[i],
+                    require_movement: true, 
+                    post_trial_gap: 1000,
+                    //prompt_location: "above",
+                    step: 1,
+                    start: 0,
+                    min: -200,
+                    max: 200        
+                    }
+
+                    timeline.push(rating_trial)
+
+    }
+
+    // Block break//
+
+    if(i==exemplars.length-1){
+        var block_break = {
+        type: "html-button-response",
+        stimulus:  "<p>Great Job! You're done rating all concepts!<br></br></p>",
+         choices: ['Next'],   
+         };
+         timeline.push(block_break)
+
+     }else if(i<exemplars.length){
+        var block_break = {
+        type: "html-button-response",
+        stimulus:  "<p>Great Job! You've finished block "+(i+1)+".<br></br> You have "+(exemplars.length-(i+1))+" block(s) left to go.<br></br></p>",
+         choices: ['Next'],   
+         };
+         timeline.push(block_break)
+     }
+
+}
+
+
+
+
+    // Color Vision check //
+    var colorvision = {
+        type: 'survey-multi-choice',
+        questions: [
+            {prompt: "Do you have difficulty seeing colors or noticing differences<br>between colors compared to the average person?",
+            options: ["Yes", "No"],
+            horizontal: false,
+            required: true, 
+            name: 'colorDifficulty'},
+
+            {prompt: "Do you consider yourself to be colorblind? ",
+            options: ["Yes", "No"],
+            horizontal: false,
+            required: true, 
+            name: 'colorBlind'}
+        ],
+        preamble: "",
+        button_label: "Done",
+        randomize_question_order: false
+        }; 
+    timeline.push(colorvision); 
+
+
+//server calling with AJAX
+    function saveData(data_object) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'write_data.php'); 
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+        if(xhr.status == 200){
+        var response = JSON.parse(JSON.stringify(xhr.responseText)); 
+        }
+    };
+    xhr.send(data_object.json());
+    }
+
+//Remove (from jspsych data) the first line of data (fake trial), which has already been written to the database & create a new variable with the rest of the data to save
+function finalSave (){
+    var data_to_save = jsPsych.data.get().filterCustom(function(trial){
+        return trial.trial_index > 0;})
+    saveData(data_to_save)
+    }
+
+//Call function to save all the data 
+    timeline.push({
+    type: 'call-function',
+    func: finalSave
+    });
+
+
+    var end_completion = {
+             type: "html-keyboard-response",
+             stimulus: function(){
+               // jsPsych.data.get().localSave('csv',randomID+".csv") // saves to local device  
+                return "<p>Great job! You have finished the experiment.</p>" +
+                "<p>The goal of this experiment is to investigate what factors influence peoples associations between colors and concepts. In the experiment, you rated how much you associated colors with different concepts." +
+                "<p>Participants were randomly assigned a subset of concepts out of a list of concepts we are interested in. For example, you may have rated associations for colors with fruits or directions, whereas other participants provided ratings for colors with sceneries or emotions." +
+                
+                "<p>Thank you for participating!"+
+                "<br>Please enter the following code on your mTurk HIT: <br><b>"+subject_id+"</b></p>"+
+               "<p>You may now close this window.</p>";},
+            choices: jsPsych.NO_KEYS} //Prevents any input reponse from moving beyond the screen
+    timeline.push(end_completion)
+  
+//Exit fullscreen
+timeline.push({
+    type: 'fullscreen',
+    fullscreen_mode: false
+})
+
+
+/* ---------------------------------- End of experiment ---------------------------------------- */
+
+    
+
+// Run the timeline sequence //
+jsPsych.init({
+        timeline: timeline,
+        show_progress_bar: false,
+
+    })
+}
+}
+
+// Run the outer timeline sequence //
+
+jsPsych.init({
+            timeline: timeline0,
+        })
+
+    </script>
+   
+</html>

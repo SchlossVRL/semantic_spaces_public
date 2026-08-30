@@ -1,0 +1,805 @@
+"rt","stimulus","response","trial_type","trial_index","time_elapsed","internal_node_id","subject_id","condition_num","sona_id","success","question_order","slider_start","practiceTrial","practiceTrialNum","correct","scale","concept"
+"3500","Welcome to our experiment!<p>At the bottom of this screen, you will see a button that says ""Begin Experiment"".<br>Please only click that button when you are ready to complete the 30 minute experiment in one sitting.</p><p> Once you click that button, it will not be possible to restart the experiment.","0","html-button-response","0","3503","0.0-0.0","lsdzocj925","4","87865","","","","","","","",""
+"3406","","","fullscreen","1","7913","0.0-1.0","lsdzocj925","4","87865","true","","","","","","",""
+"7166","","{""Consent"":[""<strong>I consent</strong>""]}","survey-multi-select","2","15083","0.0-2.0","lsdzocj925","4","87865","","[0]","","","","","",""
+"5677","Welcome! <p> This experiment involves two parts: demographic information, followed by the experimental task.<p> It will take about 30 minutes to complete both parts.","0","html-button-response","3","20762","0.0-3.0","lsdzocj925","4","87865","","","","","","","",""
+"12777","","{""Age"":""20"",""Gender"":""female"",""Race/ethnicity"":""white"",""Languages"":""english ""}","survey-text","4","33548","0.0-4.0","lsdzocj925","4","87865","","","","","","","",""
+"139218","
+                        <div style=""height:680px;"">
+                            <div style='text-align:left; font-size:20px; line-height:25px; width: 1400px;'>
+                                During this experiment you will be presented with a series of concepts, one at a time, from the set below:                             </div>
+
+                           <div style=""text-align: left; width: 1500px;"">
+                                <p style=""font-size:20px; line-height:20px;"">dress, pants, shirt, socks, shoes, blueberry, lemon, mango, strawberry, watermelon</p>
+                                <p style=""font-size:20px; line-height:20px;"">beach, field,ocean, sky, sunset, angry, disgust, fearful, happy, sad</p>
+                                <p style=""font-size:20px; line-height:20px;""> above, below, beside, near, far, dawn, day, dusk, night, noon</p>
+                                <p style=""font-size:22px; line-height:18px;""></p>
+                            </div>
+                            <div style='text-align:left; font-size:20px; line-height:25px; width: 1400px;'>
+                                For each concept, you will be asked to rate where you think it falls on each of the response scales with the following endpoints:
+                            </div>
+                            <div style=""text-align: center; width: 1400px; "">
+                                <p style=""font-size:25px; line-height:18px; "">dark vs. bright</p>
+                                <p style=""font-size:25px; line-height:18px; "">treble vs. bass</p>
+                                <p style=""font-size:25px;line-height:18px;"">rounded vs. angular</p>
+                                <p style=""font-size:25px;line-height:18px; "">foul vs. fragrant</p>
+                                <p style=""font-size:25px;line-height:18px; "">passive vs. active</p>
+                                <p style=""font-size:25px;line-height:22px;"">smooth vs. rough</p>
+                            </div>
+                            <div style='text-align:left; font-size:20px; line-height:25px; width: 1400px;'>
+                                Each trial will include one concept word and one response scale. You will be asked to make your rating by sliding the cursor along a slider response scale.                                Before beginning, please look at the list of concepts and scales.                                 For each scale, think about the concept you associate most with the left endpoint.                                When you see that concept for that response scale, please click near the left of the scale.                                Now, please think about the concept you associate most with the right endpoint of each scale. 
+                                When you see that concept for that response scale, please click near the right of the scale. 
+                                Please use the full range of the scale.                                That is, if you believe a concept is somewhat associated with both endpoints, you would click at the midpoint of the scale.                                You will be asked to rate each concept for a given scale before moving on to the next.<br>Press the 'Continue' button for instructions on how to use the slider.
+
+                            </div>
+                                <!-- Centered text paragraphs -->
+                            
+                        </div>
+                            ","null","html-slider-response","5","172769","0.0-5.0","lsdzocj925","4","87865","","","0","true","","","",""
+"2144","<div style=""width:800px;""><p style=""text-align:left"">To move the slider, click and drag your cursor to the location of the scale where you would like to make your rating and then let go. When you let go of the slider, your response will be recorded and the next trial will begin. <br>
+                    We are interested in your initial impressions of each concept for a given scale, so please go with your first intuition. <br>
+                    Before you begin the experiment, there will be four training trials for you to practice using the slider. <br>
+                     When you are ready to start the training trials, please click ""Continue"".</p><br></div>","0","html-button-response","6","174914","0.0-6.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                                    <p style=""font-size:25px;"">Please move the slider all the way to the <br> right endpoint of the scale</p>
+
+                                    </div>
+                                </div>","-5","html-slider-response","7","179168","0.0-7.0-0.0","lsdzocj925","4","87865","","","0","true","0","false","",""
+"1575","<p align='center'><b>Not quite!</b> The slider was not placed near the instructed located. Click on 'Continue' to try again. </p>","0","html-button-response","8","181245","0.0-7.0-1.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                                    <p style=""font-size:25px;"">Please move the slider all the way to the <br> right endpoint of the scale</p>
+
+                                    </div>
+                                </div>","200","html-slider-response","9","182914","0.0-7.1-0.1","lsdzocj925","4","87865","","","0","true","0","true","",""
+"920","<p align='center'><b>Good job!</b> Click on 'Continue' to proceed.</p>","0","html-button-response","10","184339","0.0-7.1-1.1","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                                    <p style=""font-size:25px;"">Please move the slider all the way to the <br> left endpoint of the scale</p>
+
+                                    </div>
+                                </div>","-200","html-slider-response","11","186830","0.0-8.0-0.0","lsdzocj925","4","87865","","","0","true","1","true","",""
+"921","<p align='center'><b>Good job!</b> Click on 'Continue' to proceed.</p>","0","html-button-response","12","188261","0.0-8.0-1.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                                    <p style=""font-size:25px;"">Please move the slider halfway between the center and right endpoint of the scale</p>
+
+                                    </div>
+                                </div>","106","html-slider-response","13","194509","0.0-9.0-0.0","lsdzocj925","4","87865","","","0","true","2","true","",""
+"988","<p align='center'><b>Good job!</b> Click on 'Continue' to proceed.</p>","0","html-button-response","14","196003","0.0-9.0-1.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                                    <p style=""font-size:25px;"">Please move the slider halfway between the center and left endpoint of the scale</p>
+
+                                    </div>
+                                </div>","-109","html-slider-response","15","199520","0.0-10.0-0.0","lsdzocj925","4","87865","","","0","true","3","true","",""
+"879","<p align='center'><b>Good job!</b> Click on 'Continue' to proceed.</p>","0","html-button-response","16","200917","0.0-10.0-1.0","lsdzocj925","4","87865","","","","","","","",""
+"1072","<p>Great job! You've completed the practice trials. Now you will begin the main task.</p>","0","html-button-response","17","201990","0.0-11.0","lsdzocj925","4","87865","","","","","","","",""
+"4745","<p>In this block of trials, you will be asked to rate how much you associate each concept on a scale where the endpoints are:</p > <p style = 'font-size:150%; font-weight: bold'>smooth vs. rough</p><br></br>","0","html-button-response","18","206736","0.0-12.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >below</p>
+                        </div>","-59","html-slider-response","19","215635","0.0-13.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","below"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dress</p>
+                        </div>","-162","html-slider-response","20","218763","0.0-14.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","dress"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sunset</p>
+                        </div>","-200","html-slider-response","21","221328","0.0-15.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","sunset"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >day</p>
+                        </div>","-24","html-slider-response","22","224679","0.0-16.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","day"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dusk</p>
+                        </div>","80","html-slider-response","23","227978","0.0-17.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","dusk"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shoes</p>
+                        </div>","70","html-slider-response","24","230765","0.0-18.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","shoes"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >above</p>
+                        </div>","-70","html-slider-response","25","233834","0.0-19.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","above"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >field</p>
+                        </div>","-156","html-slider-response","26","236691","0.0-20.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","field"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >watermelon</p>
+                        </div>","-154","html-slider-response","27","240190","0.0-21.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","watermelon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >socks</p>
+                        </div>","78","html-slider-response","28","242483","0.0-22.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","socks"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >near</p>
+                        </div>","98","html-slider-response","29","244931","0.0-23.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","near"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >happy</p>
+                        </div>","-200","html-slider-response","30","247229","0.0-24.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","happy"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >ocean</p>
+                        </div>","175","html-slider-response","31","251055","0.0-25.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","ocean"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sky</p>
+                        </div>","-200","html-slider-response","32","253563","0.0-26.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","sky"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >noon</p>
+                        </div>","-108","html-slider-response","33","257130","0.0-27.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","noon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >pants</p>
+                        </div>","72","html-slider-response","34","260846","0.0-28.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","pants"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >strawberry</p>
+                        </div>","-70","html-slider-response","35","263124","0.0-29.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","strawberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beach</p>
+                        </div>","-200","html-slider-response","36","265377","0.0-30.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","beach"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >angry</p>
+                        </div>","200","html-slider-response","37","267703","0.0-31.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","angry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shirt</p>
+                        </div>","-54","html-slider-response","38","273839","0.0-32.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","shirt"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >blueberry</p>
+                        </div>","-147","html-slider-response","39","276069","0.0-33.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","blueberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >far</p>
+                        </div>","157","html-slider-response","40","278377","0.0-34.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","far"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >night</p>
+                        </div>","-137","html-slider-response","41","281200","0.0-35.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","night"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dawn</p>
+                        </div>","-94","html-slider-response","42","286054","0.0-36.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","dawn"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beside</p>
+                        </div>","-65","html-slider-response","43","288770","0.0-37.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","beside"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sad</p>
+                        </div>","200","html-slider-response","44","290715","0.0-38.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","sad"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >lemon</p>
+                        </div>","54","html-slider-response","45","293358","0.0-39.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","lemon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >fearful</p>
+                        </div>","200","html-slider-response","46","295720","0.0-40.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","fearful"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >mango</p>
+                        </div>","-69","html-slider-response","47","298649","0.0-41.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","mango"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >disgust</p>
+                        </div>","200","html-slider-response","48","300638","0.0-42.0","lsdzocj925","4","87865","","","0","","","","smooth vs. rough","disgust"
+"1934","<p>Great Job! You've finished block 1.<br></br> You have 5 block(s) left to go.<br></br></p>","0","html-button-response","49","303074","0.0-43.0","lsdzocj925","4","87865","","","","","","","",""
+"7501","<p>In this block of trials, you will be asked to rate how much you associate each concept on a scale where the endpoints are:</p > <p style = 'font-size:150%; font-weight: bold'>rounded vs. angular</p><br></br>","0","html-button-response","50","310576","0.0-44.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >field</p>
+                        </div>","200","html-slider-response","51","314604","0.0-45.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","field"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >below</p>
+                        </div>","-110","html-slider-response","52","316882","0.0-46.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","below"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dusk</p>
+                        </div>","-106","html-slider-response","53","325166","0.0-47.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","dusk"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >mango</p>
+                        </div>","-200","html-slider-response","54","327725","0.0-48.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","mango"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >lemon</p>
+                        </div>","-200","html-slider-response","55","330082","0.0-49.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","lemon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >disgust</p>
+                        </div>","106","html-slider-response","56","332786","0.0-50.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","disgust"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sad</p>
+                        </div>","-114","html-slider-response","57","334912","0.0-51.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","sad"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >watermelon</p>
+                        </div>","-200","html-slider-response","58","336906","0.0-52.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","watermelon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >near</p>
+                        </div>","167","html-slider-response","59","339828","0.0-53.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","near"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >above</p>
+                        </div>","-130","html-slider-response","60","341743","0.0-54.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","above"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >fearful</p>
+                        </div>","131","html-slider-response","61","345104","0.0-55.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","fearful"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >far</p>
+                        </div>","143","html-slider-response","62","347721","0.0-56.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","far"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dawn</p>
+                        </div>","-93","html-slider-response","63","349573","0.0-57.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","dawn"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shoes</p>
+                        </div>","200","html-slider-response","64","351793","0.0-58.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","shoes"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >angry</p>
+                        </div>","174","html-slider-response","65","354063","0.0-59.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","angry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >pants</p>
+                        </div>","200","html-slider-response","66","356225","0.0-60.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","pants"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beside</p>
+                        </div>","-68","html-slider-response","67","359014","0.0-61.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","beside"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >noon</p>
+                        </div>","-142","html-slider-response","68","361881","0.0-62.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","noon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >ocean</p>
+                        </div>","141","html-slider-response","69","366955","0.0-63.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","ocean"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >night</p>
+                        </div>","-127","html-slider-response","70","370985","0.0-64.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","night"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shirt</p>
+                        </div>","200","html-slider-response","71","373504","0.0-65.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","shirt"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >socks</p>
+                        </div>","200","html-slider-response","72","375552","0.0-66.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","socks"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >happy</p>
+                        </div>","-83","html-slider-response","73","377721","0.0-67.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","happy"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beach</p>
+                        </div>","115","html-slider-response","74","381465","0.0-68.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","beach"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >day</p>
+                        </div>","-110","html-slider-response","75","383780","0.0-69.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","day"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sunset</p>
+                        </div>","-200","html-slider-response","76","385745","0.0-70.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","sunset"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sky</p>
+                        </div>","-200","html-slider-response","77","388108","0.0-71.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","sky"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >blueberry</p>
+                        </div>","-200","html-slider-response","78","390452","0.0-72.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","blueberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >strawberry</p>
+                        </div>","-200","html-slider-response","79","392788","0.0-73.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","strawberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dress</p>
+                        </div>","200","html-slider-response","80","394860","0.0-74.0","lsdzocj925","4","87865","","","0","","","","rounded vs. angular","dress"
+"956","<p>Great Job! You've finished block 2.<br></br> You have 4 block(s) left to go.<br></br></p>","0","html-button-response","81","396319","0.0-75.0","lsdzocj925","4","87865","","","","","","","",""
+"1074","<p>In this block of trials, you will be asked to rate how much you associate each concept on a scale where the endpoints are:</p > <p style = 'font-size:150%; font-weight: bold'>dark vs. bright</p><br></br>","0","html-button-response","82","397394","0.0-76.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >socks</p>
+                        </div>","-128","html-slider-response","83","411007","0.0-77.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","socks"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shirt</p>
+                        </div>","1","html-slider-response","84","415544","0.0-78.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","shirt"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >angry</p>
+                        </div>","-163","html-slider-response","85","418811","0.0-79.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","angry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >field</p>
+                        </div>","177","html-slider-response","86","421696","0.0-80.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","field"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sky</p>
+                        </div>","176","html-slider-response","87","424090","0.0-81.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","sky"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dawn</p>
+                        </div>","-200","html-slider-response","88","440331","0.0-82.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","dawn"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >lemon</p>
+                        </div>","200","html-slider-response","89","442583","0.0-83.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","lemon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >blueberry</p>
+                        </div>","-52","html-slider-response","90","447190","0.0-84.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","blueberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >happy</p>
+                        </div>","200","html-slider-response","91","449213","0.0-85.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","happy"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >watermelon</p>
+                        </div>","154","html-slider-response","92","451555","0.0-86.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","watermelon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >below</p>
+                        </div>","-171","html-slider-response","93","453848","0.0-87.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","below"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >day</p>
+                        </div>","200","html-slider-response","94","456010","0.0-88.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","day"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beside</p>
+                        </div>","-22","html-slider-response","95","460800","0.0-89.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","beside"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >pants</p>
+                        </div>","-74","html-slider-response","96","463742","0.0-90.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","pants"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dusk</p>
+                        </div>","-200","html-slider-response","97","465415","0.0-91.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","dusk"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >ocean</p>
+                        </div>","200","html-slider-response","98","468001","0.0-92.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","ocean"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >strawberry</p>
+                        </div>","187","html-slider-response","99","470268","0.0-93.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","strawberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >fearful</p>
+                        </div>","-200","html-slider-response","100","472220","0.0-94.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","fearful"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >disgust</p>
+                        </div>","-134","html-slider-response","101","474260","0.0-95.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","disgust"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >noon</p>
+                        </div>","200","html-slider-response","102","476682","0.0-96.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","noon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >above</p>
+                        </div>","114","html-slider-response","103","478885","0.0-97.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","above"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >far</p>
+                        </div>","-27","html-slider-response","104","481934","0.0-98.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","far"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sad</p>
+                        </div>","-93","html-slider-response","105","484202","0.0-99.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","sad"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sunset</p>
+                        </div>","-32","html-slider-response","106","490830","0.0-100.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","sunset"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shoes</p>
+                        </div>","1","html-slider-response","107","495810","0.0-101.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","shoes"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dress</p>
+                        </div>","90","html-slider-response","108","498416","0.0-102.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","dress"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >night</p>
+                        </div>","-200","html-slider-response","109","501226","0.0-103.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","night"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >mango</p>
+                        </div>","160","html-slider-response","110","503443","0.0-104.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","mango"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beach</p>
+                        </div>","200","html-slider-response","111","505794","0.0-105.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","beach"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >near</p>
+                        </div>","43","html-slider-response","112","507958","0.0-106.0","lsdzocj925","4","87865","","","0","","","","dark vs. bright","near"
+"843","<p>Great Job! You've finished block 3.<br></br> You have 3 block(s) left to go.<br></br></p>","0","html-button-response","113","509311","0.0-107.0","lsdzocj925","4","87865","","","","","","","",""
+"4988","<p>In this block of trials, you will be asked to rate how much you associate each concept on a scale where the endpoints are:</p > <p style = 'font-size:150%; font-weight: bold'>foul vs. fragrant</p><br></br>","0","html-button-response","114","514300","0.0-108.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >noon</p>
+                        </div>","78","html-slider-response","115","516568","0.0-109.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","noon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >happy</p>
+                        </div>","200","html-slider-response","116","518288","0.0-110.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","happy"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dawn</p>
+                        </div>","117","html-slider-response","117","520568","0.0-111.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","dawn"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shirt</p>
+                        </div>","115","html-slider-response","118","522717","0.0-112.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","shirt"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >night</p>
+                        </div>","125","html-slider-response","119","525980","0.0-113.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","night"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >field</p>
+                        </div>","102","html-slider-response","120","528356","0.0-114.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","field"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >ocean</p>
+                        </div>","155","html-slider-response","121","530678","0.0-115.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","ocean"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sky</p>
+                        </div>","160","html-slider-response","122","532898","0.0-116.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","sky"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dress</p>
+                        </div>","171","html-slider-response","123","534923","0.0-117.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","dress"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >angry</p>
+                        </div>","-186","html-slider-response","124","537576","0.0-118.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","angry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sunset</p>
+                        </div>","190","html-slider-response","125","540308","0.0-119.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","sunset"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beach</p>
+                        </div>","190","html-slider-response","126","542449","0.0-120.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","beach"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beside</p>
+                        </div>","24","html-slider-response","127","546597","0.0-121.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","beside"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >far</p>
+                        </div>","-28","html-slider-response","128","548717","0.0-122.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","far"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >pants</p>
+                        </div>","-24","html-slider-response","129","554905","0.0-123.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","pants"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >watermelon</p>
+                        </div>","44","html-slider-response","130","556747","0.0-124.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","watermelon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >above</p>
+                        </div>","82","html-slider-response","131","559262","0.0-125.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","above"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >mango</p>
+                        </div>","90","html-slider-response","132","561362","0.0-126.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","mango"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >fearful</p>
+                        </div>","-108","html-slider-response","133","565255","0.0-127.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","fearful"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >day</p>
+                        </div>","101","html-slider-response","134","567029","0.0-128.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","day"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shoes</p>
+                        </div>","95","html-slider-response","135","570942","0.0-129.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","shoes"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >strawberry</p>
+                        </div>","150","html-slider-response","136","574568","0.0-130.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","strawberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dusk</p>
+                        </div>","114","html-slider-response","137","576661","0.0-131.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","dusk"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >below</p>
+                        </div>","-22","html-slider-response","138","580971","0.0-132.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","below"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sad</p>
+                        </div>","-102","html-slider-response","139","582928","0.0-133.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","sad"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >lemon</p>
+                        </div>","168","html-slider-response","140","585258","0.0-134.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","lemon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >near</p>
+                        </div>","68","html-slider-response","141","587650","0.0-135.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","near"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >socks</p>
+                        </div>","-170","html-slider-response","142","591478","0.0-136.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","socks"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >blueberry</p>
+                        </div>","166","html-slider-response","143","593828","0.0-137.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","blueberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >disgust</p>
+                        </div>","-191","html-slider-response","144","596716","0.0-138.0","lsdzocj925","4","87865","","","0","","","","foul vs. fragrant","disgust"
+"232565","<p>Great Job! You've finished block 4.<br></br> You have 2 block(s) left to go.<br></br></p>","0","html-button-response","145","829792","0.0-139.0","lsdzocj925","4","87865","","","","","","","",""
+"19524","<p>In this block of trials, you will be asked to rate how much you associate each concept on a scale where the endpoints are:</p > <p style = 'font-size:150%; font-weight: bold'>treble vs. bass</p><br></br>","0","html-button-response","146","849316","0.0-140.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >field</p>
+                        </div>","-116","html-slider-response","147","852804","0.0-141.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","field"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >socks</p>
+                        </div>","42","html-slider-response","148","854809","0.0-142.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","socks"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beach</p>
+                        </div>","-169","html-slider-response","149","857265","0.0-143.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","beach"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >blueberry</p>
+                        </div>","40","html-slider-response","150","859945","0.0-144.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","blueberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >disgust</p>
+                        </div>","160","html-slider-response","151","861878","0.0-145.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","disgust"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dress</p>
+                        </div>","-55","html-slider-response","152","863766","0.0-146.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","dress"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sky</p>
+                        </div>","-155","html-slider-response","153","865458","0.0-147.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","sky"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dusk</p>
+                        </div>","29","html-slider-response","154","870571","0.0-148.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","dusk"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >ocean</p>
+                        </div>","-171","html-slider-response","155","872845","0.0-149.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","ocean"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >mango</p>
+                        </div>","-48","html-slider-response","156","874815","0.0-150.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","mango"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >strawberry</p>
+                        </div>","-138","html-slider-response","157","876700","0.0-151.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","strawberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >angry</p>
+                        </div>","200","html-slider-response","158","879029","0.0-152.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","angry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >watermelon</p>
+                        </div>","-86","html-slider-response","159","881529","0.0-153.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","watermelon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >noon</p>
+                        </div>","-74","html-slider-response","160","883604","0.0-154.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","noon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >below</p>
+                        </div>","3","html-slider-response","161","886539","0.0-155.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","below"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >far</p>
+                        </div>","94","html-slider-response","162","892515","0.0-156.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","far"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >above</p>
+                        </div>","-94","html-slider-response","163","896093","0.0-157.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","above"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sunset</p>
+                        </div>","143","html-slider-response","164","899876","0.0-158.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","sunset"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shirt</p>
+                        </div>","-51","html-slider-response","165","902078","0.0-159.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","shirt"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shoes</p>
+                        </div>","120","html-slider-response","166","904053","0.0-160.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","shoes"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sad</p>
+                        </div>","189","html-slider-response","167","907251","0.0-161.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","sad"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beside</p>
+                        </div>","-26","html-slider-response","168","909764","0.0-162.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","beside"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dawn</p>
+                        </div>","-26","html-slider-response","169","914846","0.0-163.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","dawn"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >pants</p>
+                        </div>","67","html-slider-response","170","916520","0.0-164.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","pants"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >lemon</p>
+                        </div>","-140","html-slider-response","171","918488","0.0-165.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","lemon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >fearful</p>
+                        </div>","200","html-slider-response","172","920741","0.0-166.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","fearful"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >night</p>
+                        </div>","89","html-slider-response","173","922816","0.0-167.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","night"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >near</p>
+                        </div>","-126","html-slider-response","174","925193","0.0-168.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","near"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >day</p>
+                        </div>","-114","html-slider-response","175","927168","0.0-169.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","day"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >happy</p>
+                        </div>","-200","html-slider-response","176","931889","0.0-170.0","lsdzocj925","4","87865","","","0","","","","treble vs. bass","happy"
+"920","<p>Great Job! You've finished block 5.<br></br> You have 1 block(s) left to go.<br></br></p>","0","html-button-response","177","933311","0.0-171.0","lsdzocj925","4","87865","","","","","","","",""
+"85800","<p>In this block of trials, you will be asked to rate how much you associate each concept on a scale where the endpoints are:</p > <p style = 'font-size:150%; font-weight: bold'>passive vs. active</p><br></br>","0","html-button-response","178","1019111","0.0-172.0","lsdzocj925","4","87865","","","","","","","",""
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sky</p>
+                        </div>","-54","html-slider-response","179","1023719","0.0-173.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","sky"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >mango</p>
+                        </div>","54","html-slider-response","180","1026921","0.0-174.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","mango"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >day</p>
+                        </div>","-46","html-slider-response","181","1031790","0.0-175.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","day"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sad</p>
+                        </div>","-104","html-slider-response","182","1036276","0.0-176.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","sad"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >disgust</p>
+                        </div>","-25","html-slider-response","183","1041137","0.0-177.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","disgust"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shirt</p>
+                        </div>","-149","html-slider-response","184","1043868","0.0-178.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","shirt"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >sunset</p>
+                        </div>","-38","html-slider-response","185","1046528","0.0-179.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","sunset"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >field</p>
+                        </div>","156","html-slider-response","186","1049767","0.0-180.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","field"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >near</p>
+                        </div>","82","html-slider-response","187","1052216","0.0-181.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","near"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >above</p>
+                        </div>","116","html-slider-response","188","1054629","0.0-182.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","above"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >happy</p>
+                        </div>","174","html-slider-response","189","1056633","0.0-183.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","happy"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beach</p>
+                        </div>","-89","html-slider-response","190","1059713","0.0-184.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","beach"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dusk</p>
+                        </div>","-94","html-slider-response","191","1062068","0.0-185.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","dusk"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >shoes</p>
+                        </div>","149","html-slider-response","192","1064240","0.0-186.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","shoes"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >watermelon</p>
+                        </div>","106","html-slider-response","193","1066408","0.0-187.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","watermelon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >fearful</p>
+                        </div>","156","html-slider-response","194","1069893","0.0-188.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","fearful"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dawn</p>
+                        </div>","-77","html-slider-response","195","1071685","0.0-189.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","dawn"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >below</p>
+                        </div>","-144","html-slider-response","196","1073795","0.0-190.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","below"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >socks</p>
+                        </div>","-154","html-slider-response","197","1076563","0.0-191.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","socks"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >strawberry</p>
+                        </div>","153","html-slider-response","198","1078537","0.0-192.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","strawberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >pants</p>
+                        </div>","-95","html-slider-response","199","1080694","0.0-193.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","pants"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >noon</p>
+                        </div>","-118","html-slider-response","200","1083444","0.0-194.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","noon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >ocean</p>
+                        </div>","160","html-slider-response","201","1085805","0.0-195.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","ocean"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >lemon</p>
+                        </div>","187","html-slider-response","202","1088078","0.0-196.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","lemon"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >dress</p>
+                        </div>","-73","html-slider-response","203","1090781","0.0-197.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","dress"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >angry</p>
+                        </div>","200","html-slider-response","204","1092941","0.0-198.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","angry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >far</p>
+                        </div>","200","html-slider-response","205","1096193","0.0-199.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","far"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >night</p>
+                        </div>","-83","html-slider-response","206","1098924","0.0-200.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","night"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >blueberry</p>
+                        </div>","-53","html-slider-response","207","1102002","0.0-201.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","blueberry"
+"NaN","<div style=""width:500px;"">
+                            <p style=""font-size:50px; font-weight:bold;""
+                            >beside</p>
+                        </div>","-157","html-slider-response","208","1104944","0.0-202.0","lsdzocj925","4","87865","","","0","","","","passive vs. active","beside"
+"876","<p>Great Job! You're done rating all concepts!<br></br></p>","0","html-button-response","209","1106325","0.0-203.0","lsdzocj925","4","87865","","","","","","","",""

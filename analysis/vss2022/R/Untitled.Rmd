@@ -1,0 +1,163 @@
+---
+title: "Word2Vec analyses"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+library(glmnet)
+library(glmnetUtils)
+library(ggplot2)
+```
+
+```{r}
+setwd("/Users/kushin/Documents/vss2022/R")
+
+df = read.csv('../data/reg_df.csv')
+```
+
+
+```{r}
+col_rating_cols = colnames(df)[2:59]
+w2v_cols = colnames(df)[60:359]
+fic_cols =  colnames(df)[360:659]
+pc_cols = colnames(df)[660:ncol(df)] ### make this more programmatic
+
+holdout_seq= seq(from=1,to=30,by=5)
+
+```
+
+
+```{r}
+holdout_seq= seq(from=1,to=30,by=5)
+c1_results<-{}
+c2_results<-{}
+c3_results<-{}
+
+for(i in 0:4){
+holdout_rows = holdout_seq+i
+print(holdout_rows)
+c1_model = cv.glmnet(as.matrix(df[!(rownames(df)%in%holdout_rows),w2v_cols]),as.matrix(df[!(rownames(df)%in%holdout_rows),pc_cols[1]]),alpha =0)
+c2_model = cv.glmnet(as.matrix(df[!(rownames(df)%in%holdout_rows),w2v_cols]),as.matrix(df[!(rownames(df)%in%holdout_rows),pc_cols[2]]),alpha =0)
+c3_model = cv.glmnet(as.matrix(df[!(rownames(df)%in%holdout_rows),w2v_cols]),as.matrix(df[!(rownames(df)%in%holdout_rows),pc_cols[3]]),alpha =0)
+
+
+preds = predict(c1_model, newx = as.matrix(df[(rownames(df)%in%holdout_rows),w2v_cols]), s = 0.05)
+targets = df[(rownames(df)%in%holdout_rows),pc_cols][1]
+c1_results<- rbind(c1_results,cbind(df[(rownames(df)%in%holdout_rows),'concepts'],preds, targets))
+
+preds = predict(c2_model, newx = as.matrix(df[(rownames(df)%in%holdout_rows),w2v_cols]), s =  0.05)
+targets = df[(rownames(df)%in%holdout_rows),pc_cols][2]
+c2_results<- rbind(c2_results,cbind(df[(rownames(df)%in%holdout_rows),'concepts'],preds, targets))
+
+preds = predict(c3_model, newx = as.matrix(df[(rownames(df)%in%holdout_rows),w2v_cols]), s =  0.05)
+targets = df[(rownames(df)%in%holdout_rows),pc_cols][3]
+c3_results<- rbind(c3_results,cbind(df[(rownames(df)%in%holdout_rows),'concepts'],preds, targets))
+
+
+}
+
+colnames(c1_results)<- c('concepts','pred','target')
+colnames(c2_results)<- c('concepts','pred','target')
+colnames(c3_results)<- c('concepts','pred','target')
+
+print(paste0('coord 1 correlations:',round(cor(c1_results$pred,c1_results$target),3)))
+
+print(paste0('coord 2 correlations:',round(cor(c2_results$pred,c2_results$target),3)))
+
+print(paste0('coord 3 correlations:',round(cor(c3_results$pred,c3_results$target),3)))
+
+predicted_coords<-data.frame(cbind(concepts = c1_results$concepts, c1_pred= c1_results$pred,c2_pred=  c2_results$pred, c3_pred=c3_results$pred))
+
+write.csv(predicted_coords,'../data/w2v_predicted_coords.csv')
+
+```
+
+
+```{r}
+
+ggplot(c1_results,aes(x=pred,y=target),)+geom_point(colour = "#0EACA2", size = 5)+ geom_smooth(method='lm', formula= y~x,fullrange = T, se=FALSE )+ theme_classic(base_size = 23)+labs(x='predicted',y='true', title= 'component 1' )+xlim(-.3,.3)+ylim(-.3,.3)+theme(
+        axis.title=element_text(size=26,face="bold"))
+ggsave(
+  'c1.pdf',
+  plot = last_plot(),
+  device = 'pdf',
+  path = '../plots/',
+  scale = 1,
+  width = 10,
+  height = 10,
+  units = c("in"),
+  dpi = 300,
+
+)
+
+
+```
+
+```{r}
+
+holdout_seq= seq(from=1,to=30,by=5)
+c1_results<-{}
+c2_results<-{}
+c3_results<-{}
+
+for(i in 0:4){
+holdout_rows = holdout_seq+i
+c1_model = cv.glmnet(as.matrix(df[!(rownames(df)%in%holdout_rows),fic_cols]),as.matrix(df[!(rownames(df)%in%holdout_rows),pc_cols[1]]),alpha =0)
+c2_model = cv.glmnet(as.matrix(df[!(rownames(df)%in%holdout_rows),fic_cols]),as.matrix(df[!(rownames(df)%in%holdout_rows),pc_cols[2]]),alpha =0)
+c3_model = cv.glmnet(as.matrix(df[!(rownames(df)%in%holdout_rows),fic_cols]),as.matrix(df[!(rownames(df)%in%holdout_rows),pc_cols[3]]),alpha =0)
+
+
+preds = predict(c1_model, newx = as.matrix(df[(rownames(df)%in%holdout_rows),fic_cols]),  s = 0.05)
+targets = df[(rownames(df)%in%holdout_rows),pc_cols][1]
+c1_results<- rbind(c1_results,cbind(df[(rownames(df)%in%holdout_rows),'concepts'],preds, targets))
+
+preds = predict(c2_model, newx = as.matrix(df[(rownames(df)%in%holdout_rows),fic_cols]),  s = 0.05)
+targets = df[(rownames(df)%in%holdout_rows),pc_cols][2]
+c2_results<- rbind(c2_results,cbind(df[(rownames(df)%in%holdout_rows),'concepts'],preds, targets))
+
+preds = predict(c3_model, newx = as.matrix(df[(rownames(df)%in%holdout_rows),fic_cols]),  s = 0.05)
+targets = df[(rownames(df)%in%holdout_rows),pc_cols][3]
+c3_results<- rbind(c3_results,cbind(df[(rownames(df)%in%holdout_rows),'concepts'],preds, targets))
+
+
+}
+
+colnames(c1_results)<- c('concepts','pred','target')
+colnames(c2_results)<- c('concepts','pred','target')
+colnames(c3_results)<- c('concepts','pred','target')
+
+print(paste0('coord 1 correlations:',round(cor(c1_results$pred,c1_results$target),3)))
+
+print(paste0('coord 2 correlations:',round(cor(c2_results$pred,c2_results$target),3)))
+
+print(paste0('coord 3 correlations:',round(cor(c3_results$pred,c3_results$target),3)))
+
+predicted_coords<-data.frame(cbind(concepts = c1_results$concepts, c1_pred= c1_results$pred,c2_pred=  c2_results$pred, c3_pred=c3_results$pred))
+
+write.csv(predicted_coords,'../data/fic_predicted_coords.csv')
+
+```
+
+```{r}
+summary(lm(c1_results$target~c1_results$pred))
+
+summary(lm(c2_results$target~c2_results$pred))
+
+summary(lm(c3_results$target~c3_results$pred))
+```
+
+
+
+```{r}
+library(psych)
+coef(c1_model,s='lambda.min')
+
+
+
+p = predict(c1_model, newx = as.matrix(df[(rownames(df)%in%holdout_rows),w2v_cols]), s = "lambda.min")
+t = df[(rownames(df)%in%holdout_rows),pc_cols][1]
+
+cor(p,t)
+print(psych::corr.test(p,t),short=F)
+```
+

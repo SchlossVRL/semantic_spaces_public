@@ -1,0 +1,60 @@
+# file: init.yaml
+
+html:
+  instructions: Please select which of the 2 items at the bottom is similar in color to the item at the top 
+  debrief: Thank you! You should return to the Qualtrics page to finish up the experiment! Your code is 09111996
+  max_queries: 200  
+  
+targets: [
+'dress',
+'pants',
+'shirt',
+'shoes',
+'socks',
+'above',
+'below',
+'beside',
+'far',
+'near',
+'angry',
+'disgust',
+'fearful',
+'happy',
+'sad',
+'blueberry',
+'lemon',
+'mango',
+'strawberry',
+'watermelon',
+'beach',
+'field',
+'ocean',
+'sky',
+'sunset',
+'dawn',
+'day',
+'dusk',
+'night',
+'noon'
+]
+
+samplers:
+  Random: {}
+  Validation: {"n_queries": 20}
+sampling:
+  probs: {"Random": 90, "Validation": 10}
+
+
+
+# css: >
+#   #q-head {
+#     max-width: 50%;
+#   }
+#   #q-left {
+#     max-width: 50%;
+#   }
+#   #q-right {
+#     max-width: 50%;
+#   }
+
+

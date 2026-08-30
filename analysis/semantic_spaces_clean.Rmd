@@ -1,0 +1,270 @@
+---
+title: "semantic_spaces_clean"
+author: "Kushin Mukherjee"
+date: "9/27/2021"
+output: html_document
+---
+
+
+### Load in libraries
+```{r message=TRUE, include=FALSE}
+
+library(tidyverse)
+library(R.matlab)
+library(FactoMineR)
+library(plotrix)
+library(GPArotation) 
+library(psy)
+library(psych)
+library(png)
+library(grid)
+library(gtools)
+library(factoextra)
+library(gridExtra)
+library(tidytext)
+
+```
+
+### Set working directory. Replace with where your analysis folder is
+
+```{r}
+setwd('/Users/kushin/Documents/Github/semantic_spaces/analysis')
+
+```
+
+
+```{r}
+
+
+d<-read.csv('../data/semantic_spaces_raw.csv') ## Read in raw dataset of mturk ratings
+d1<-d%>%filter(trial_type=='image-slider-responseMAS') ### filter out non-ratings trials
+
+
+d1$trial_index<- as.numeric(d1$trial_index)
+d1$prompt<- as.character(d1$prompt)
+ratings_df <- d1%>%select(trial_index,rt,response, prompt,concept,color_index,subject_id, workerID, color_rgb) ### select only a subset of columns that we'll need
+
+uw58<-read.csv('../data/UW_58_rgb.csv', header = F) ## Read in dataset with color info about uw58
+
+ratings_df$color_index<- ratings_df$color_index+1
+
+## Remove problematic subjects
+ratings_df<- ratings_df%>%filter(subject_id != 'o4pwsj92hkkb2z783lue')
+ratings_df<- ratings_df%>%filter(subject_id != 'nllbusbr3mkfsrmrozv1')
+ratings_df<- ratings_df%>%filter(subject_id!= 'e70koc6vf0tnpg0f4bvz')
+ratings_df$response<- (ratings_df$response+200)/400 ### make ratings go from 0 to 1
+
+ratings_df%>%group_by(concept)%>%summarize(num_subs = length(unique(subject_id)) )
+
+```
+
+pilot0_ratings_unscaled has the ratings trials we want
+
+```{r}
+really_run=F
+
+if( really_run==T){
+ratings_df$color_rgb<- paste0("#", ratings_df$color_rgb)
+ratings_df$color_rgb<-ifelse(ratings_df$color_index==23, '#000000',ratings_df$color_rgb) ### change weird output for color white for uw58
+
+colnames(ratings_df)[which(names(ratings_df) == "color_rgb")] <- "color_hex"
+colnames(ratings_df)[which(names(ratings_df) == "concept")] <- "category"
+colnames(ratings_df)[which(names(ratings_df) == "prompt")] <- "concept"
+
+write.csv(ratings_df,'../data/pilot0_ratings_unscaled.csv',row.names = FALSE)
+}
+
+
+ratings_df<-read.csv('../data/pilot0_ratings_unscaled.csv')
+```
+
+
+```{r}
+## change some things to chars
+ratings_df$concept<- as.character(ratings_df$concept) 
+ratings_df$category<- as.character(ratings_df$category)   
+ratings_df$color_hex<- as.character(ratings_df$color_hex) 
+
+```
+
+
+#### Raw Association Ratings with error bars
+
+Change` really_run` to `True` to run and save these plots in the plots directory.
+
+```{r}
+
+color_dict = unique(ratings_df$color_hex)
+names(color_dict) = unique(ratings_df$color_index)
+
+
+### function to plot the association ratings for a given concept
+plot_assoc_ratings<- function(qconcept){
+ratings_df_m<-ratings_df%>%group_by(concept, color_index)%>%summarize(sd_rating = sd(response),mean_rating = mean(response), category = category[1], color_hex = color_hex[1], num_raters = n(), sem = sd_rating/sqrt(num_raters)) ## hacky way of getting category and color
+
+d<-ratings_df_m%>%filter(category==qconcept)
+
+d$color_index<-factor(d$color_index)
+
+p<-ggplot(d, aes(x =reorder_within(color_index,-mean_rating,concept) , y=mean_rating, fill = as.character(color_index)))+
+  geom_bar(stat='identity',width = 1, show.legend = FALSE, color=NA)+
+geom_errorbar(aes(ymin = mean_rating-(sd_rating/sqrt(num_raters)), ymax = mean_rating+(sd_rating/sqrt(num_raters))), width=0.3)+
+  facet_wrap(~concept,scales= 'free_x')+
+  scale_fill_manual(values=color_dict)+
+  theme_classic() +
+  theme(axis.ticks.x=element_blank(),axis.text.x=element_text(angle=90,size=6),axis.text=element_text(size=15, colour = 'black'),axis.title=element_text(size=14,face="bold"), strip.text = element_text(size=20,face="bold"),panel.background = element_rect(fill = "#595959",
+                                colour = "#595959",
+                                size = 0.5, linetype = "solid"),
+  plot.background = element_rect(fill="#595959") )+
+  scale_x_reordered()+ scale_y_continuous(expand = c(0,0), limits = c(0,1))
+
+print(p)
+
+
+really_run=T
+if(really_run==T){
+ggsave(
+  paste0('../plots/',qconcept,'.pdf'),
+  plot = last_plot(),
+  device = "pdf",
+  scale = 1,
+  width = 10,
+  height = 7,
+  dpi = 300,
+  limitsize = TRUE
+)
+}
+}
+
+for(this_concept in unique(ratings_df$category)){
+  plot_assoc_ratings(this_concept)
+}
+
+
+```
+
+```{r}
+### summarize ratings across participants
+mean_ratings<- ratings_df%>%group_by(category,concept,color_index)%>%summarize(mean_rating = mean(response))
+
+### create color concept association matrix
+
+ratings_mat <- matrix(0,30,58)
+unique(mean_ratings$concept)
+for(i in 1:30){
+  for(j in 1:58){
+  ratings_mat[i,j] <-mean_ratings[mean_ratings$concept==unique(mean_ratings$concept)[i],]$mean_rating[j]
+  }
+}
+
+rownames(ratings_mat)<- unique(mean_ratings$concept)
+
+
+
+```
+
+```{r}
+really_run=F
+if(really_run==T){
+write.csv(ratings_mat, '../data/uw_58_ratings_matrix_unscaled.csv',row.names = FALSE)
+color_dict_df<- data.frame('hex' =color_dict, 'index' = names(color_dict))
+write.csv(color_dict_df, '../data/color_dict_uw58.csv',row.names = FALSE)
+}
+
+ratings_mat <- read.csv('../data/uw_58_ratings_matrix_unscaled.csv')
+concept_list<-ratings_mat[,1]
+```
+
+
+```{r}
+
+### Do an SVD of the color concept matrix
+
+
+really_run=T
+ratings_mat_c<-ratings_mat ## create a shallow copy of the ratings matrix
+col_means=numeric() ## vector to hold column means
+
+if(really_run==T){
+for(i in 1:ncol(ratings_mat[,-1])){
+ col_means<- rbind(col_means,mean(ratings_mat[,1+i]))
+ ratings_mat_c[,1+i]<- ratings_mat[,1+i]-mean(ratings_mat[,1+i])  # mean center the columns
+}}
+
+svdobj<-svd(ratings_mat_c[,-1]) ## do svd on the mean centered matrix
+svals<- matrix(0, nrow=30,ncol = 30)  ## create diagonal matrix to hold singular values
+diag(svals)<- svdobj$d
+
+#write.csv((svdobj$v%*%svals/sqrt(30-1)), '../data/basis_vecs_scaled.csv') ## write out the right singular values scaled
+### May 2021 Fix 
+write.csv((svdobj$v), '../data/basis_vecs_scaled.csv') ## write out the right singular values scaled
+write.csv((svdobj$u%*%svals), '../data/factor_vecs_scaled.csv') ## write out the left singular values scaled w singular vals
+
+
+
+### hold out concepts and compute the right singular vectors on the remaining matrix
+
+for(this_concept in concept_list){
+  ratings_mat_sub <- ratings_mat_c[ratings_mat_c[,1]!=this_concept,-1]
+  svdobj_sub<-svd(ratings_mat_sub)
+  svals_sub<- matrix(0, nrow=29,ncol = 29)
+  diag(svals_sub)<- svdobj_sub$d
+#  write.csv((svdobj_sub$v%*%svals_sub/sqrt(29-1)), paste0('../data/basis_vecs_scaled_',this_concept,'.csv')) ## write out the right singular values scaled
+  
+### May 2021 Fix 
+write.csv((svdobj_sub$v), paste0('../data/basis_vecs_scaled_',this_concept,'.csv'),row.names = FALSE) ## write out the right singular values scaled
+
+}
+
+
+### hold out colors and compute the right singular vectors on the remaining matrix
+
+for(this_color in 1:58){
+  ratings_mat_sub <- ratings_mat_c[,-c(1,this_color+1)]
+  svdobj_sub<-svd(ratings_mat_sub)
+  svals_sub<- matrix(0, nrow=30,ncol = 30)
+  diag(svals_sub)<- svdobj_sub$d
+ # write.csv((svdobj_sub$v%*%svals_sub/sqrt(30-1)), paste0('../data/basis_vecs_scaled_color_',this_color,'.csv')) ## write out the right singular values scaled
+  
+### May 2021 Fix
+ write.csv((svdobj_sub$v), paste0('../data/basis_vecs_scaled_color_',this_color,'.csv'),row.names = FALSE) ## write out the right singular values scaled
+ write.csv(svdobj_sub$u%*%svals_sub[,1:8], paste0('../data/left_8_vec_color_',this_color,'.csv'),row.names = FALSE)
+ ## write out the first 8 left singular vectors scaled by the singular values
+
+} 
+#write.csv(svdobj$v, '../data/basis_vecs.csv') ## write out the right singular values
+write.csv(col_means, '../data/col_means.csv',row.names = FALSE) ## write out the column means
+
+```
+
+
+```{r}
+### Extract the first 8 left singular vectors
+rank8_basis<-svdobj$u[,1:8]
+rank30_basis<-svdobj$u
+
+color_by_basis = matrix(0, 8, 58)
+
+for(i in 1:8){
+  for(j in 1:58){
+  
+    ## +1 because of dummy col 1
+    color_by_basis[i,j] = cor(rank8_basis[,i],ratings_mat[,j+1])
+  }
+}
+color_by_basis
+
+color_dict_df$hex<- as.character(color_dict_df$hex)
+color_dict_df
+
+pal<-ggplot(color_dict_df, aes(x=factor(index), y=10, fill = factor(index)))+ geom_bar(stat='identity')+theme(axis.text.x = element_text(angle = 90, vjust= 0.7), legend.position = "none")+ scale_fill_manual(values=color_dict)
+
+pal
+
+
+
+
+```
+
+
+

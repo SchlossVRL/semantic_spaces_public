@@ -1,0 +1,1746 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+### Load in libraries
+```{r message=TRUE, include=FALSE}
+
+library(tidyverse)
+library(softImpute)
+library(R.matlab)
+library(FactoMineR)
+library(plotrix)
+library(GPArotation) 
+library(psy)
+library(psych)
+library(png)
+library(grid)
+library(gtools)
+library(factoextra)
+library(gridExtra)
+library(tidytext)
+
+```
+
+
+### Set working directory. Replace with where your analysis folder is
+
+```{r}
+setwd('/Users/kushin/Documents/Github/semantic_spaces/analysis')
+
+```
+
+
+### Read in data and do some early preprocessing
+
+```{r eval=FALSE, include=FALSE}
+d<-read.csv('../data/semantic_spaces_raw.csv') ## Read in raw dataset of mturk ratings
+#d<-read.csv('../data/colorability_raw.csv')
+#d<-read.csv('../data/colorability_raw_2.csv')
+#d_<-read.csv('../data/uw71assoc.csv')
+#d_
+
+#d1<-d_%>%filter(trial_type=='survey-multi-select')
+d1<-d%>%filter(trial_type=='image-slider-responseMAS')
+
+
+d1$trial_index<- as.numeric(d1$trial_index)
+d1$prompt<- as.character(d1$prompt)
+ratings_df <- d1%>%select(trial_index,rt,response, prompt,concept,color_index,subject_id, workerID, color_rgb)
+
+uw58<-read.csv('../data/UW_58_rgb.csv', header = F) ## Read in dataset with color info about uw58
+
+ratings_df$color_index<- ratings_df$color_index+1
+
+#ratings_df$response<-(ratings_df$response-min(ratings_df$response))/(max(ratings_df$response)-min(ratings_df$response))
+ratings_df
+
+## Remove problematic subjects
+ratings_df<- ratings_df%>%filter(subject_id != 'o4pwsj92hkkb2z783lue')
+ratings_df<- ratings_df%>%filter(subject_id != 'nllbusbr3mkfsrmrozv1')
+ratings_df<- ratings_df%>%filter(subject_id!= 'e70koc6vf0tnpg0f4bvz')
+
+
+
+#ratings_df<- ratings_df%>%filter(!(subject_id%in% unique(d$subject_id)))
+ratings_df<- ratings_df%>%filter(prompt!= "<p style='width:1000px'>In this experiment yo")
+
+ratings_df%>%group_by(concept)%>%summarize(num_subs = length(unique(subject_id)) )
+
+
+ratings_df$response<- (ratings_df$response+200)/400
+
+
+```
+
+```{r}
+deminfo<-d1%>%filter(!(subject_id%in%unique(d$subject_id)))%>%select(responses)
+
+deminfo
+
+  gends<-{}
+for(i in 1:nrow(deminfo)){
+gends[i]<- str_split( deminfo$responses[i],'"')[[1]][4]
+
+}
+unique(gends)
+
+fm_count=0
+for(i in 1:length(gends)){
+  
+  if(gends[i]=='female'|| gends[i]=='Female'||gends[i]=='famale'||gends[i]=='female '||gends[i]==''||gends[i]=='Woman'||gends[i]=='femalw'){
+    fm_count = fm_count+1
+  }
+}
+fm_count
+180-97
+
+
+ages<-{}
+for(i in 1:nrow(deminfo)){
+ages[i]<- as.numeric(str_split( deminfo$responses[i],'"')[[1]][8])
+
+}
+mean(ages)
+```
+
+
+
+
+### How many subjects do we really need?
+
+
+
+```{r}
+ratings_df%>%group_by(concept, prompt)%>%summarize(num_subs = length(unique(subject_id)) )
+
+inter_group_cor<- numeric()
+num_in_group<- c(5,10,15,20,30,40,50,60)
+for(i in 1:500){
+for (this_num in num_in_group){
+for (this_concept in unique(ratings_df$prompt)){
+ sub_df<-ratings_df%>%filter(prompt==this_concept)
+ 
+ sample_subjs<- sample( unique(sub_df$subject_id),20*2)
+ 
+ group1ratings<- sub_df%>%filter(subject_id %in%sample( sample_subjs[1:20],this_num, replace = T) )%>%group_by(color_index)%>%summarize(mean_rating = mean(response))
+ 
+ group2ratings<- sub_df%>%filter(subject_id %in%sample(sample_subjs[(21):(40)], this_num, replace = T))%>%group_by(color_index)%>%summarize(mean_rating = mean(response))
+ 
+cor_val <- cor(group1ratings$mean_rating, group2ratings$mean_rating)
+inter_group_cor<-rbind.data.frame(inter_group_cor,cbind.data.frame(this_concept, this_num, cor_val))
+ 
+}}}
+
+inter_group_cor<- as.data.frame(inter_group_cor)
+
+inter_group_cor
+
+mean_ig_cor<-inter_group_cor%>%group_by(this_concept, this_num)%>%summarize(mean_cor = mean(cor_val))
+
+
+ggplot(mean_ig_cor, aes(x= this_num, y= mean_cor))+geom_line()+facet_wrap(~this_concept, nrow=6, ncol = 5)+ theme_classic() 
+
+ggplot(mean_ig_cor, aes(x= this_num, y= mean_cor, col = this_concept))+geom_line()+ theme_classic() + geom_hline(yintercept = 0.75,col='black', size=1)
+
+mean_ig_cor%>%group_by(this_num)%>%summarize(mean_of_means = mean(mean_cor))%>%ggplot(aes(x= this_num, y= mean_of_means))+geom_line()+ theme_classic() +ylab('Average correlation')+xlab('group size')
+
+
+ggsave( plot=last_plot(), filename = "../plots/inter_group_single.png", height = 9, width = 11 )
+
+mean_ig_cor
+
+
+```
+
+
+
+```{r}
+
+```
+
+
+### Replicate Tim's initial analyses and visualizations
+
+### Functions for plotting and generating correlation matrices
+
+```{r}
+
+ratings_df_fruits<-  ratings_df%>%filter(concept=='fruits') ### subset dataset to only contain fruits
+get.cor.mat <- function (df = ratings_df_fruits) 
+{
+#This function computes, for each subject and word, the
+#correlation between the subject's ratings across colors
+#and the mean of all other subject ratings across colors
+#d is a 3D array containing the individual subject ratings
+#formatted as in the original experiment
+##########################
+
+    nsj <- length(unique(df$subject_id))#Number of subjects
+    nw <- 5  #Number of words
+    subjects<- unique(df$subject_id)
+    words<- unique(df$prompt)
+    o <- matrix(0, nw, nsj)  #Initialize output matrix
+    
+	
+	#Loop over words and subjects to compute each correlation and
+	#store in output matrix
+    for (i in c(1:nw)) for (j in c(1:nsj)) {
+        s <- df%>%filter(subject_id == subjects [j],prompt==words[i])%>%arrange(color_index)%>%select(response)
+        m <- df%>%filter(subject_id != subjects [j],prompt==words[i])%>%group_by(color_index)%>%summarize(mean_response = mean(response))
+        o[i, j] <- cor(s$response, m$mean_response)
+    }
+    o #Return output matrix
+}
+
+words<-unique(ratings_df_fruits$prompt)
+plot.cor.mat <- function (d) 
+{
+#This function plots the correlations of individual subject ratings
+#with mean subject ratings for each word.
+#d is a matrix output by get.cor.matrix
+################################
+
+    nw <- dim(d)[1] #Number of words
+    nsj <- dim(d)[2] #Number of subjects
+	  
+	
+	#Generate blank plot
+    plot(0, 0, type = "n", ylim = range(d), xlim = c(1, nw), 
+        xlab = "Word", xaxt = "n",ylab = "Correlation")
+    
+    axis(1, at=seq(nw), labels=words)
+		
+	#Add individual subjects plotted as gray lines/dots
+    for (i in c(1:nsj)) points(c(1:nw), d[, i], col = gray(0.8), 
+        type = "o", pch = 16)
+		
+	#Add mean across subjects for each word as large black dot
+    points(c(1:nw), rowMeans(d), pch = 16, cex = 2, col = 1)
+	
+    abline(h = 0) #Add horizontal line at r=0
+}
+
+
+test.complete <- function (d, p = 0.1, r = 4, plt = T, w = fruits, jc = judgedcols) 
+{
+#This function does matrix completion and plots results for
+#a random hold-out set
+#d: word-by-color matrix containing mean ratings
+#p: Proportion of cells to use for hold-outs
+#r: Maximum rank of matrix
+#plt: Flag, should results be plotted?
+#w: Character vector containing words
+###########################################
+
+    wm <- matrix(w, dim(d)[1], dim(d)[2]) #Matrix indicating word in each cell, for plotting later
+	jcm <- t(matrix(jc, dim(d)[2], dim(d)[1])) #Matrix indicating color for each cell, for plotting later
+    trn <- d #Make training matrix
+    ncells <- dim(d)[1] * dim(d)[2] #How many cells in matrix?
+    trn[sample(c(1:ncells), floor(p * ncells))] <- NA  #Remove hold-outs from training matrix
+    m <- softImpute(trn, type = "als", rank.max = r) #Fit model
+    pred <- complete(trn, m) #Make predictions for held-out items
+	
+	#Generate plot
+    if (plt) {
+        plot(d[!is.na(trn)], pred[!is.na(trn)], xlab = "True", 
+            ylab = "Predicted", pch = 16, col = gray(0.8), xlim = range(d), 
+            ylim = range(pred))
+        points(d[is.na(trn)], pred[is.na(trn)], pch = 16,
+			   col=jcm[is.na(trn)])
+        text(d[is.na(trn)], pred[is.na(trn)], label = wm[is.na(trn)], 
+            cex = 0.7, col=jcm[is.na(trn)])
+    }
+    cor(d[is.na(trn)], pred[is.na(trn)])
+}
+
+
+```
+
+### Generate correlation and association rating plots. 
+
+There are error bar versions of the association ratings later in the notebook
+
+```{r}
+
+concept_list = as.character(unique(ratings_df$concept))
+
+for(this_concept in concept_list){
+  
+ratings_df_dir<-  ratings_df%>%filter(concept==this_concept)
+mean_ratings<-ratings_df_dir%>%group_by(prompt,color_index)%>%summarize(mean_response =mean(response))
+sd(mean_ratings$mean_response)
+
+dmat<-get.cor.mat(ratings_df_dir)
+words<-unique(ratings_df_dir$prompt)
+
+
+par(mfrow = c(4,3), mar = c(1,1,1,0))
+for(i in c(1:5)){
+    barplot(mean_ratings[mean_ratings$prompt==unique(mean_ratings$prompt)[i],]$mean_response, col=rgb(uw58[,1],uw58[,2],uw58[,3]), border = NA, ylim = c(0,1), yaxt = "n")
+    box()
+    title(unique(mean_ratings$prompt)[i])
+}
+plot.cor.mat(dmat)
+  
+  
+}
+```
+
+
+
+
+
+
+ 
+ 
+
+ 
+```{r}
+
+cor_mat <- matrix(0,5,58)
+unique(mean_ratings$prompt)
+for(i in 1:5){
+  for(j in 1:58){
+  cor_mat[i,j] <-mean_ratings[mean_ratings$prompt==unique(mean_ratings$prompt)[i],]$mean_response[j]
+  }
+  }
+
+dim(cor_mat)
+
+e_vals <- eigen(cor(t(cor_mat)))
+barplot(e_vals$values)
+
+
+```
+
+
+Predictions from Matrix completion vs. true ratings for a single concept-category.
+
+```{r}
+test.complete(cor_mat,w = unique(mean_ratings$prompt),jc=rgb(uw58[,1],uw58[,2],uw58[,3]), r=2)
+```
+
+
+
+### Interlude: Writing out a ratings csv for future analyses if needed.
+
+`pilot0_ratings.csv` has the tidied up version of all the raw data.
+
+```{r}
+
+
+really_run=F
+
+if( really_run==T){
+ratings_df$color_rgb<- paste0("#", ratings_df$color_rgb)
+
+ratings_df$color_rgb<-ifelse(ratings_df$color_index==23, '#000000',ratings_df$color_rgb)
+
+colnames(ratings_df)[which(names(ratings_df) == "color_rgb")] <- "color_hex"
+colnames(ratings_df)[which(names(ratings_df) == "concept")] <- "category"
+colnames(ratings_df)[which(names(ratings_df) == "prompt")] <- "concept"
+
+write.csv(ratings_df,'../data/pilot0_ratings_unscaled.csv')
+}
+ratings_df<-read.csv('../data/pilot0_ratings_unscaled.csv')
+```
+
+
+```{r}
+ratings_df
+```
+
+
+Predictions from Matrix completion vs. true ratings for all concept-categories.
+
+```{r}
+mean_ratings<- ratings_df%>%group_by(concept,color_index)%>%summarize(mean_response =mean(response))
+
+
+cor_mat <- matrix(0,30,58)
+unique(mean_ratings$concept)
+for(i in 1:30){
+  for(j in 1:58){
+  cor_mat[i,j] <-mean_ratings[mean_ratings$concept==unique(mean_ratings$concept)[i],]$mean_response[j]
+  }
+  }
+cor_mat
+
+e_vals <- eigen(cor(t(cor_mat)))
+barplot(e_vals$values)
+
+
+test.complete(cor_mat,w = unique(mean_ratings$prompt),jc=rgb(uw58[,1],uw58[,2],uw58[,3]), r=)
+```
+
+### Validating mturk data with lab data
+
+Read in lab data for fruits and see how well they line up with mturk data.
+
+We are going to compute the average concept x color association and first find the correlation between the entire lab dataset and entire mturk dataset.
+```{r}
+
+
+frnames <- c("Mango", "Watermelon","Honeydew", "Cantaloupe", "Grapefruit", 
+             "Strawberry", "Raspberry", "Blueberry", "Avocado", "Orange", "Lime", "Lemon")
+
+dLab<- readMat('../data/FruitData.mat')
+
+dLab<-dLab$FruitAssoc[,c(8,12,1,6,2),]
+
+
+inds<-sample(54,54/2, replace = F)  ### sample half the participants in the lab data
+inv_inds<-seq(54)[!seq(54) %in% inds] ### get indices for the other half of the participants
+d1<-dLab[,,inds]
+d2<-dLab[,,inv_inds]
+
+mrating <- apply(dLab, c(1,2), "mean")
+
+
+
+mean_fruit_ratings<- ratings_df_fruits%>%group_by(prompt,color_index)%>%summarize(mean_response =mean(response))
+
+
+
+fruit_ratings_mat <- matrix(0,5,58)
+unique(mean_fruit_ratings$prompt)
+for(i in 1:5){
+  for(j in 1:58){
+  fruit_ratings_mat[i,j] <-mean_fruit_ratings[mean_fruit_ratings$prompt==unique(mean_fruit_ratings$prompt)[i],]$mean_response[j]
+  }
+  }
+
+dim(cor_mat)
+
+e_vals <- eigen(cor(t(fruit_ratings_mat)))
+barplot(e_vals$values)
+
+
+
+cor(mrating,t(fruit_ratings_mat))  ### The diagonal correlation values tell us how well lab and mturk data align
+```
+ 
+ 
+ Let's visualize these association ratings to be sure
+ 
+Lab data:  
+
+```{r}
+par(mfrow = c(2,3), mar = c(1,1,1,0))
+for(i in c(1:5)){
+    barplot(mrating[,i], col=rgb(uw58[,1],uw58[,2],uw58[,3]), border = NA, ylim = c(0,1), yaxt = "n")
+    box()
+    title(unique(mean_fruit_ratings$prompt)[i])
+}
+
+
+```
+
+mturk data:  
+
+```{r}
+
+par(mfrow = c(2,3), mar = c(1,1,1,0))
+for(i in c(1:5)){
+    barplot(mean_fruit_ratings[mean_fruit_ratings$prompt==unique(mean_fruit_ratings$prompt)[i],]$mean_response, col=rgb(uw58[,1],uw58[,2],uw58[,3]), border = NA, ylim = c(0,1), yaxt = "n")
+    box()
+    title(unique(mean_fruit_ratings$prompt)[i])
+}
+```
+
+
+
+----
+
+
+```{r}
+
+##Load up the saved ratings
+ratings_df<-read.csv('../data/pilot0_ratings_unscaled.csv')
+
+ratings_df$concept<- as.character(ratings_df$concept) 
+ratings_df$color_rgb<- as.character(ratings_df$color_rgb) 
+## change some things to chars
+ratings_df$category<- as.character(ratings_df$category)   
+ratings_df$color_hex<- as.character(ratings_df$color_hex) 
+
+
+
+```
+
+
+
+#### Raw Association Ratings with error bars
+
+Change` really_run` to `True` to run and save these plots in the plots directory.
+
+```{r}
+
+#color_dict = unique(ratings_df$color_rgb)
+color_dict = unique(ratings_df$color_hex)
+names(color_dict) = unique(ratings_df$color_index)
+
+
+### function to plot the association ratings for a given concept
+plot_assoc_ratings<- function(qconcept){
+ratings_df_m<-ratings_df%>%group_by(concept, color_index)%>%summarize(sd_rating = sd(response),mean_rating = mean(response), category = category[1], color_hex = color_hex[1], num_raters = n(), sem = sd_rating/sqrt(num_raters)) ## hacky way of getting category and color
+
+d<-ratings_df_m%>%filter(category==qconcept)
+
+
+d$color_index<-factor(d$color_index)
+
+p<-ggplot(d, aes(x =reorder_within(color_index,-mean_rating,concept) , y=mean_rating, fill = as.character(color_index)))+
+  geom_bar(stat='identity',width = 1, show.legend = FALSE, color=NA)+
+geom_errorbar(aes(ymin = mean_rating-(sd_rating/sqrt(num_raters)), ymax = mean_rating+(sd_rating/sqrt(num_raters))), width=0.3)+
+  facet_wrap(~concept,scales= 'free_x')+
+  scale_fill_manual(values=color_dict)+
+  theme_classic() +
+  theme(axis.ticks.x=element_blank(),axis.text.x=element_text(angle=90,size=6),axis.text=element_text(size=15, colour = 'black'),axis.title=element_text(size=14,face="bold"), strip.text = element_text(size=20,face="bold"),panel.background = element_rect(fill = "#595959",
+                                colour = "#595959",
+                                size = 0.5, linetype = "solid"),
+  plot.background = element_rect(fill="#595959") )+
+  scale_x_reordered()+ scale_y_continuous(expand = c(0,0), limits = c(0,1))
+
+print(p)
+
+
+really_run=T
+if(really_run==T){
+ggsave(
+  paste0('../plots/',qconcept,'.pdf'),
+  plot = last_plot(),
+  device = "pdf",
+  scale = 1,
+  width = 10,
+  height = 7,
+  dpi = 300,
+  limitsize = TRUE
+)
+}
+}
+
+for(this_concept in unique(ratings_df$category)){
+  plot_assoc_ratings(this_concept)
+}
+
+```
+
+#### Split half correlations
+
+See how well half of the lab dataset correlates with another half sampled 100 times. This gives us a baseline of what to expect in terms of consistency of ratings and gives us something to compare our mturk ratings to.
+
+```{r}
+
+dLab<- readMat('../data/FruitData.mat')
+dLab<-dLab$FruitAssoc[,c(8,12,1,6,2),]
+
+rawdat<-read.csv('../data/semantic_spaces_raw.csv')
+uw58full<-read.csv('../data/UW58_colors.csv')
+
+
+labR<-{}
+turkR<-{}
+
+for(i in 1:100){
+
+
+
+s1<-sample(unique(ratings_df$subject_id), length(unique(ratings_df$subject_id))/2, replace = FALSE)
+
+d1<-ratings_df[ratings_df$subject_id %in% s1,]
+
+d2<-ratings_df[!(ratings_df$subject_id %in% s1),]
+
+
+mean_ratings_d1<- d1%>%group_by(category,concept,color_index)%>%summarize(mean_response =mean(response))%>%filter(category=="fruits")
+
+mean_ratings_d2<- d2%>%group_by(category,concept,color_index)%>%summarize(mean_response =mean(response))%>%filter(category=="fruits")
+
+r_cofTurk <- cor(mean_ratings_d1$mean_response, mean_ratings_d2$mean_response)
+
+turkR<-c(turkR,r_cofTurk)
+
+
+
+inds<-sample(54,54/2, replace = F)
+inv_inds<-seq(54)[!seq(54) %in% inds]
+d1<-dLab[,,inds]
+d2<-dLab[,,inv_inds]
+
+d1_m<- apply(d1, c(1,2), "mean")
+dim(d1_m)<-NULL
+
+d2_m<- apply(d2, c(1,2), "mean")
+dim(d2_m)<-NULL
+r_cofLab<-  cor(d1_m,d2_m)
+labR<-c(labR,r_cofLab)
+
+}
+
+print('Mturk summary:')
+mean(turkR)
+sd(turkR)
+
+print('Lab summary:')
+mean(labR)
+sd(labR)
+```
+
+### Saving out mat files for 'Tree Plots'
+
+Code for generating association *.mat files for generating our 'treeplots' that show how association ratings are distributed over LAB space.
+
+No need to run if plots already exist.
+
+NOTE: Need to refactor this a bit to avoid painful manual saving.
+
+```{r}
+really_run = F
+
+if(really_run==T){
+lab<-matrix(c(uw58full$L,uw58full$a,uw58full$b),c(58,3))
+
+uw58mat<-data.matrix(uw58, rownames.force = NA)
+
+
+assoc_df_full<- mean_ratings%>%filter(category=='clothing')
+
+assoc_mat<-{}
+Name<-{}
+for(this_concept in unique(assoc_df_full$concept)){
+  
+assoc_df<- assoc_df_full%>%filter(concept==this_concept)
+assoc_mat<- cbind(assoc_mat,assoc_df$mean_z_rating_norm)
+Name<- cbind(Name,this_concept)
+}
+
+
+writeMat('..data/mturkclothes.mat', rgb=uw58mat,lab=lab,assoc=assoc_mat,Name=Name)
+}
+
+
+```
+
+
+### PCA with embedded Treeplots
+
+Z-score the color-concept ratings within participants and concepts. E.g. z-score for all ratings for participant 1.
+Next we find the mean z-scored rating and normalize them to a 0-1 range.
+Finally we construct a 30x58 concept by color matrix.
+
+
+
+
+
+```{r}
+
+
+### Z-score within participants 
+#ratings_df<- ratings_df%>%group_by(subject_id)%>%mutate(z_rating = (response - mean(response))/sd(response))
+
+
+### Find mean ratings and normalize to 0,1 range
+
+mean_ratings<- ratings_df%>%group_by(category,concept,color_index)%>%summarize(mean_rating = mean(response))
+
+
+
+mean_ratings<-mean_ratings%>%group_by(concept)%>%mutate(mean_rating_norm = (mean_rating-min(mean_rating))/(max(mean_rating)-min(mean_rating)), mean_z_rating_norm = (mean_z_rating-min(mean_z_rating))/(max(mean_z_rating)-min(mean_z_rating)) )
+
+
+mean_ratings
+
+
+
+#mean_ratings<-mean_ratings%>%group_by(concept)%>%mutate(mean_rating_norm = (mean_rating-min(mean_rating))/(max(mean_rating)-min(mean_rating)), mean_z_rating_norm = (mean_z_rating-min(mean_z_rating))/(max(mean_z_rating)-min(mean_z_rating)) )
+
+### Create concept X color matrix 
+
+ratings_mat <- matrix(0,30,58)
+unique(mean_ratings$concept)
+for(i in 1:30){
+  for(j in 1:58){
+  ratings_mat[i,j] <-mean_ratings[mean_ratings$concept==unique(mean_ratings$concept)[i],]$mean_rating[j]
+  }
+}
+
+ratings_mat
+### Compute ratings matrix and correlation matrix
+
+rownames(ratings_mat)<- unique(mean_ratings$concept)
+ratings_mat
+dim(ratings_mat)
+cormat<-cor(t(ratings_mat), use= 'complete.obs')
+covmat<-cov(t(ratings_mat), use= 'complete.obs')
+dim(cormat)
+
+eigen(cormat)$values
+
+barplot(eigen(cormat)$values)
+
+
+```
+
+```{r}
+### Do the PCA
+factors <- principal(r = cormat, nfactors = 5, rotate= 'varimax', covar = F, scores= T)
+
+factors
+```
+
+
+Proportion Variance explained -  0.26 0.16 0.15 0.12 0.10
+
+
+```{r}
+factor_df<-factors$loadings
+factor_df<- as.data.frame(unclass(factor_df))
+factor_df<- cbind(factor_df, unique(mean_ratings$concept))
+colnames(factor_df)<- c('PA1','PA2','PA5','PA3','PA4','concept')
+factor_df
+```
+
+This will read in the treeplots generated through MATLAB and embed them in a plot where the position of the concept is determined by its first and second principal component loading.
+
+```{r}
+p<- ggplot(factor_df, aes(x=PA1,y=PA2))+geom_point(alpha=0)+ ylim(c(-1,1))+xlim(c(-1,1))+ theme_classic()
+for(this_concept in unique(factor_df$concept)){
+pdsub<-factor_df[factor_df$concept==this_concept,]
+g<- rasterGrob( readPNG(paste0('../plots/',this_concept,'.png')), interpolate=TRUE)
+g$raster[g$raster=="#FFFFFF"] = "#FFFFFF00" 
+
+
+p<-p+annotation_custom(g,xmin=pdsub$PA1-0.2, xmax=pdsub$PA1+0.2,ymin=pdsub$PA2-0.2, ymax=pdsub$PA2+0.2)
+
+p<-p+ geom_text(pdsub, mapping= aes(label=concept, alpha=0.3), vjust=-3, show.legend=F)
+}
+
+print(p)
+#ggsave(plot = p,filename = '../plots/test.png', height = 6.5, width = 6.5, dpi = 300)
+
+```
+
+
+### Code to generate 1D PCA plots (Still in development. Hacky solutions so far.)
+
+
+```{r}
+top4cols<-{}
+for( i in 1:nrow(ratings_mat)){
+  top4cols<-rbind(top4cols, order(ratings_mat[i,],decreasing=T)[1:4])
+
+}
+
+rownames(top4cols) <- rownames(factor_df)
+
+
+
+top1cols<-top4cols[,1]
+
+top2cols<-top4cols[,2]
+
+top3cols<-top4cols[,3]
+
+top4cols<-top4cols[,4]
+
+
+concept_to_hex<-{}
+for(i in 1:length(top1cols)){
+  concept_to_hex<-append(concept_to_hex,color_dict[names(color_dict)==top1cols[i]])
+}
+
+
+concept_to_hex2<-{}
+for(i in 1:length(top2cols)){
+  concept_to_hex2<-append(concept_to_hex2,color_dict[names(color_dict)==top2cols[i]])
+}
+
+concept_to_hex3<-{}
+for(i in 1:length(top3cols)){
+  concept_to_hex3<-append(concept_to_hex3,color_dict[names(color_dict)==top3cols[i]])
+}
+
+
+concept_to_hex4<-{}
+for(i in 1:length(top4cols)){
+  concept_to_hex4<-append(concept_to_hex4,color_dict[names(color_dict)==top4cols[i]])
+}
+
+#concept_to_hex = list(concept_to_hex)
+names(concept_to_hex)<- rownames(top4cols)
+names(concept_to_hex2)<- rownames(top4cols)
+names(concept_to_hex3)<- rownames(top4cols)
+names(concept_to_hex4)<- rownames(top4cols)
+
+
+```
+
+
+```{r}
+
+
+ggplot(factor_df, aes(x=c(0), y=PA4, label= rownames(factor_df))) + geom_point(alpha=0)  + 
+  geom_text( size=3.5)+ geom_point(aes(x=c(0.5),y=PA4,fill=rownames(factor_df)), shape=22,show.legend = FALSE, size=3.5,stroke = 0)+ xlim(-1,2.5)+scale_fill_manual(values=concept_to_hex4)+
+  theme_classic()+
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+#ggsave(filename = 'tempPC4_4.png', plot= last_plot(), width= 5, height = 13, dpi=300)
+
+
+```
+
+
+### Matrix reconstruction using few principal components.
+
+
+Writing out csv files for ease of use later.
+
+
+```{r}
+
+ratings_mat
+really_run=F
+if(really_run==T){
+#write.csv(ratings_mat, '../data/uw_71_ratings_matrix.csv')
+write.csv(ratings_mat, '../data/uw_58_ratings_matrix_unscaled.csv')
+color_dict_df<- data.frame('hex' =color_dict, 'index' = names(color_dict))
+write.csv(color_dict_df, '../data/color_dict_uw58.csv')
+}
+
+
+```
+
+
+
+
+```{r}
+if(!exists('ratings_mat')){
+  ratings_mat = read.csv('../data/uw_58_ratings_matrix_unscaled.csv')
+}
+
+if(!exists('color_dict_df')){
+  color_dict_df = read.csv('../data/color_dict_uw58.csv')
+}
+
+### Generate PCA object from concept x color ratings matrix
+pca_obj<-ratings_mat[,-1]%>%prcomp(scale=F,center=T, retx = T)
+```
+
+
+```{r}
+### Function for reconstructing the matrix using fewer components
+
+reverse_pca <- function(n_comp = 2, pca_object = pca_obj, explore = F, num_sd=1, vmax=F){
+  
+  ## Multiply the matrix of rotated data by the transpose of the matrix 
+  ## of eigenvalues (i.e. the component loadings) to get back to a 
+  ## matrix of original data values
+  
+  
+  if(explore==T){
+    scores = numeric(n_comp)
+    scores[n_comp]<- pca_object$sdev[n_comp]*num_sd
+    if(vmax==T){
+      vmaxobj = varimax(pca_object$rotation)
+      
+       recon <- scores %*% t(vmaxobj$loadings[, 1:n_comp])
+    }else{
+
+    recon <- scores %*% t(pca_object$rotation[, 1:n_comp])
+    }
+  }
+   else{
+    recon <- pca_object$x[, 1:n_comp] %*% t(pca_object$rotation[, 1:n_comp])
+  }
+  ## Reverse any scaling and centering that was done by prcomp()
+  
+  if(all(pca_object$scale != FALSE)){
+    ## Rescale by the reciprocal of the scaling factor, i.e. back to
+    ## original range.
+    recon <- scale(recon, center = FALSE, scale = 1/pca_object$scale)
+  }
+  
+
+  
+  #if(all(pca_object$center != FALSE)){
+    ## Remove any mean centering by adding the subtracted mean back in
+   # recon <- scale(recon, scale = FALSE, center = -1 * pca_object$center)
+  #}
+  
+  
+  
+  ## Make it a data frame that we can easily pivot to long format
+  ## (because that's the format that the excellent imager library wants
+  ## when drawing image plots with ggplot)
+  recon_df <- data.frame(cbind(1:nrow(recon), recon))
+  colnames(recon_df) <- c("x", 1:(ncol(recon_df)-1))
+
+  ## Return the data to long form 
+  recon_df_long <- recon_df %>%
+    tidyr::pivot_longer(cols = -x, 
+                        names_to = "y", 
+                        values_to = "value") %>%
+    mutate(y = as.numeric(y)) %>%
+    arrange(y) %>%
+    as.data.frame()
+  
+  recon_df_long
+  return(recon_df)
+}
+```
+
+
+```{r}
+for(i in 1:30){
+  
+m<-reverse_pca(n_comp =i,pca_object = pca_obj)
+write.csv(m, paste0('ratings_matrix_',i,'PC.csv'))
+
+}
+
+## Example
+m<-reverse_pca(n_comp = 29)
+
+m
+```
+
+
+### Cluster analysis
+
+```{r}
+
+cc_assoc<-as.matrix(ratings_mat[,-1])
+rownames(cc_assoc)<- ratings_mat[,1]
+dmat<-dist(cc_assoc, upper=T, diag = T)
+
+cc_assoc
+
+clust_obj<- hclust(dmat)
+
+
+plot(clust_obj, hang = 0.1, check = TRUE,
+     axes = TRUE, frame.plot = FALSE, ann = TRUE,
+     main = "Concept Dendogram",
+     sub = NULL, xlab = NULL, ylab = "Height")
+```
+
+```{r}
+
+dmat<- as.matrix(dmat)
+dmat['dress','pants']
+
+kmeans_obj <- kmeans(cc_assoc, centers = 6,nstart = 30)
+
+print(kmeans_obj)
+
+a<-fviz_cluster(kmeans_obj, cc_assoc) 
+a<- a+ theme_classic()
+a
+```
+
+
+
+
+```{r}
+
+concept_list<-ratings_mat[,1]
+
+concept_list<- as.character(concept_list)
+
+concept_list
+
+cluster1<-c('blueberry','beach','ocean','sky')
+
+c1_mat<- ratings_mat[ratings_mat[,1]%in%cluster1,2:59]
+rownames(c1_mat)<- cluster1
+c1_dmat<-dist( c1_mat,diag = T, upper = T)
+c1_dmat
+```
+
+```{r}
+set2<-c('dress','shirt','day','noon','happy','above','dawn','beside')
+set3<-c('sunset','mango','watermelon','strawberry','field','lemon')
+set4<-c('fearful','angry','disgust','night','sad','far','below','dusk','pants','socks','shoes')
+```
+
+
+
+```{r}
+
+find_best_clust<-function(set){
+all_clusters<-combinations(length(set), 4, v=set, set=TRUE, repeats.allowed=FALSE)
+min_norm<-c()
+for(i in 1:nrow(all_clusters)){
+  this_cluster<- all_clusters[i,]
+  c_mat<- ratings_mat[ratings_mat[,1]%in%this_cluster,2:59]
+  rownames(c_mat)<- this_cluster
+  c_dmat<-dist(c_mat,diag = T, upper = T)
+  mat_diff<- as.matrix(c1_dmat-c_dmat)
+  mat_norm<- norm(mat_diff, type = 'F')
+  if(length(min_norm)==0){
+    min_norm = mat_norm
+    best_cluster = this_cluster
+  } else if(mat_norm<min_norm) {
+    min_norm = mat_norm
+    best_cluster = this_cluster
+  }
+
+}
+  return(best_cluster)
+}
+
+
+cluster2<-find_best_clust(set2)
+cluster3<-find_best_clust(set3)
+cluster4<-find_best_clust(set4)
+
+```
+
+
+```{r}
+
+##assign between conditions
+
+names(cluster1)<- sample(4,4)
+
+names(cluster2)<- sample(4,4)
+
+names(cluster3)<-sample(4,4)
+
+names(cluster4)<-sample(4,4)
+
+rbind(cluster1, cluster2[names(cluster1)], cluster3[names(cluster1)], cluster4[names(cluster1)])
+
+
+```
+
+```{r}
+
+bcluster3 = c('ocean', 'happy', 'watermelon', 'disgust')
+
+for(i in 2:30){
+  
+m<- read.csv(paste0('ratings_matrix_',i,'PC.csv'))
+m_sub<-m[m[,1]%in%bcluster3,]
+
+colnames(m_sub)<-c('concept','index',seq(1,58))
+for(j in 1:4){
+j=2
+m_ratings<-m_sub[j,]%>%select(as.character(seq(1,58)))
+
+
+m_ratings_sorted<-sort(m_ratings, decreasing = T)
+m_ratings_sorted<- as.vector(m_ratings_sorted)
+
+hp_df<- data.frame(index = names(m_ratings_sorted), rating = t(m_ratings_sorted) )
+colnames(hp_df)<- c('index','rating')
+color_dict_t<- tibble(hex = as.character(color_dict_df$hex), index = as.character(color_dict_df$index))
+hp_df$index <- factor(hp_df$index, levels = color_dict_t$index)
+
+
+p<-ggplot(hp_df, aes(x=reorder(index, -rating), y=rating, fill= index ))+geom_col()+ scale_fill_manual(values= color_dict_t$hex)+theme_classic()+ theme(panel.background = element_rect(fill = "grey",colour = "grey"), legend.position ="none", axis.ticks.x=element_blank(), axis.text.x = element_blank()) + labs(x="", y="ratings")+ lims(y=c(0,1))+ ggtitle(paste0(m_sub$concept[j],"_",i,"_PCS"))
+
+p
+
+ggsave(filename = paste0("hp_",(paste0(m_sub$concept[j],"_",i,"_PCS.png"))), plot= last_plot(), width= 20, height = 10, dpi=300, device = 'png')
+print(p)
+
+
+}
+}
+
+
+```
+
+
+
+```{r}
+sum(ratings_mat[,:59]  - m[,3:60])
+
+m_sub<-ratings_mat[ratings_mat[,1]%in%bcluster3,]
+m_sub
+colnames(m_sub) <- c('concept', seq(1,58))
+m_sub
+
+
+
+m_ratings<-m_sub[2,]%>%select(as.character(seq(1,58)))
+
+
+#m_ratings_sorted<-sort(m_ratings, decreasing = T)
+#m_ratings_sorted<- as.vector(m_ratings_sorted)
+
+hp_df<- data.frame(index = names(m_ratings), rating = t(m_ratings) )
+
+colnames(hp_df)<- c('index','rating')
+color_dict_t<- tibble(hex = as.character(color_dict_df$hex), index = as.character(color_dict_df$index))
+hp_df$index <- factor(hp_df$index, levels = color_dict_t$index)
+
+
+p<-ggplot(hp_df, aes(x=reorder(index, -rating), y=rating, fill= index ))+geom_col()+ scale_fill_manual(values= color_dict_t$hex)+theme_classic()+ theme(panel.background = element_rect(fill = "grey",colour = "grey"), legend.position ="none", axis.ticks.x=element_blank(), axis.text.x = element_blank()) + labs(x="", y="ratings")+ lims(y=c(0,1))+ ggtitle(paste0(m_sub$concept[2],"_raw"))
+
+p
+```
+
+
+
+
+```{r}
+
+### Z-score within participants and concepts
+ratings_df<- ratings_df%>%group_by(subject_id,concept)%>%mutate(z_rating = (response - mean(response))/sd(response))
+
+
+### Find mean ratings and normalize to 0,1 range
+mean_ratings<- ratings_df%>%group_by(category,concept,color_index)%>%summarize(mean_rating = mean(response), mean_z_rating = mean(z_rating))
+
+mean_ratings<-mean_ratings%>%group_by(concept)%>%mutate(mean_rating_norm = (mean_rating-min(mean_rating))/(max(mean_rating)-min(mean_rating)), mean_z_rating_norm = (mean_z_rating-min(mean_z_rating))/(max(mean_z_rating)-min(mean_z_rating)) )
+
+### Create concept X color matrix 
+
+ratings_mat_raw <- matrix(0,20,71)
+unique(mean_ratings$concept)
+for(i in 1:20){
+  for(j in 1:71){
+  ratings_mat_raw[i,j] <-mean_ratings[mean_ratings$concept==unique(mean_ratings$concept)[i],]$mean_rating[j]
+  }
+}
+
+ratings_mat_raw
+rownames(ratings_mat_raw)<- unique(mean_ratings$concept)
+ratings_mat_raw<- as.data.frame(ratings_mat_raw)
+
+
+
+ratings_mat_raw$concept<- rownames(ratings_mat_raw)
+
+
+m_sub<-ratings_mat_raw[ratings_mat_raw$concept%in%bcluster3,]
+
+colnames(m_sub)<-c(seq(1,58),'concept')
+#for(j in 1:4){
+j=2
+m_ratings<-m_sub[j,]%>%select(as.character(seq(1,58)))
+
+
+m_ratings_sorted<-sort(m_ratings, decreasing = T)
+m_ratings_sorted<- as.vector(m_ratings_sorted)
+
+hp_df<- data.frame(index = names(m_ratings_sorted), rating = t(m_ratings_sorted) )
+colnames(hp_df)<- c('index','rating')
+color_dict_t<- tibble(hex = as.character(color_dict_df$hex), index = as.character(color_dict_df$index))
+hp_df$index <- factor(hp_df$index, levels = color_dict_t$index)
+
+
+p<-ggplot(hp_df, aes(x=reorder(index, -rating), y=rating, fill= index ))+geom_col()+ scale_fill_manual(values= color_dict_t$hex)+theme_classic()+ theme(panel.background = element_rect(fill = "grey",colour = "grey"), legend.position ="none", axis.ticks.x=element_blank(), axis.text.x = element_blank()) + labs(x="", y="ratings")+ lims(y=c(0,1))+ ggtitle(paste0(m_sub$concept[j],"_raw"))
+
+p
+
+#ggsave(filename = paste0("hp_",(paste0(m_sub$concept[j],"_",i,"_PCS.png"))), plot= last_plot(), width= 20, height = 10, dpi=300, device = 'png')
+print(p)
+
+
+```
+
+
+```{r}
+
+temp<- matrix(data = rbeta(150, 5, 10), nrow=30, ncol=5)
+
+noiseless<-cbind(temp,temp,temp,temp,temp)
+
+noise_mat<- matrix(data = rnorm(150, 0, 1), nrow=30, ncol=25)
+
+
+noisy_mat<- noiseless+ noise_mat
+
+
+### Generate PCA object from concept x color ratings matrix
+pca_obj<-ratings_mat[,-1]%>%prcomp(scale=F,center=T, retx = T)
+
+
+
+
+recon_err=numeric()
+
+for(i in 2:30){
+m<-reverse_pca(n_comp = i )
+
+#recon_err[i]= norm(as.matrix(noisy_mat-m[,-1]), type = 'F')
+recon_err[i]= norm(as.matrix(ratings_mat[,-1]-m[,-1]), type = 'F')
+}
+
+
+plot(recon_err[-1])
+
+
+noisy_mat
+
+
+
+```
+
+
+
+```{r}
+
+concept_list<-as.character(ratings_mat[,1])
+
+pc_cor_df=numeric()
+
+
+
+for(i in 2:30){
+pc_mat<-read.csv(paste0('ratings_matrix_',i,'PC.csv'))
+
+
+###
+#
+###
+
+r_vals = diag(cor(t(ratings_mat[,-1]),t(pc_mat[,-c(1:2)])))
+names(r_vals)<-concept_list
+
+pc_cor_df<-rbind(pc_cor_df,cbind(i,t(r_vals)))
+}
+
+pc_cor_df<- as.data.frame(pc_cor_df)
+colnames(pc_cor_df)[1]<-"num_pc"
+
+
+
+pc_cor_df_l <- pc_cor_df%>%pivot_longer(-num_pc, names_to = 'concept', values_to = 'pearson_r')
+mean_pc_cor_df<-pc_cor_df_l%>%group_by(num_pc)%>%summarize(mean_r = mean(pearson_r))
+
+
+
+for (this_concept in concept_list){
+  
+p<-ggplot(pc_cor_df, aes_string(y=this_concept)) + geom_line(aes(x=num_pc)) +labs(x="No. of PCs", y = "pearson r") + theme_classic() + ggtitle(this_concept)
+
+
+print(p)
+}
+
+```
+
+```{r}
+ggplot(pc_cor_df_l, aes(x=num_pc, y=pearson_r, color= concept))+geom_line()+theme_classic()+geom_line(data=mean_pc_cor_df, aes(x=num_pc, y= mean_r),size = 2, col='black')
+mean_pc_cor_df_<-mean_pc_cor_df
+mean(mean_pc_cor_df_$mean_r)
+```
+
+
+
+
+
+
+```{r}
+
+pc_cor_df=numeric()
+
+for(i in 2:30){
+for(j in 1:58){
+  
+#pc_mat<-read.csv(paste0('ratings_matrix_',i,'PC.csv'))
+#pc_vec<-as.vector(as.matrix(pc_mat[,-c(1,2)]))
+  
+orig_vec<-as.vector(as.matrix(ratings_mat[,-1]))
+shuffle_inds<-sample(length(orig_vec))
+orig_mat_shuffle<- matrix(orig_vec[shuffle_inds],30,58)
+
+#pc_mat_shuffle<-matrix(pc_vec[shuffle_inds],30,58)
+pca_obj<- orig_mat_shuffle%>% prcomp(scale=F,center=T, retx = T)
+pc_mat_shuffle<- reverse_pca(n_comp = i, pca_obj=pca_obj)
+pc_mat_shuffle<-pc_mat_shuffle[,-c(1)]
+
+
+
+r_vals = diag(cor(t(orig_mat_shuffle),t(pc_mat_shuffle)))
+
+names(r_vals)<-concept_list
+
+pc_cor_df<-rbind(pc_cor_df,cbind(i,t(r_vals)))
+}}
+
+pc_cor_df<- as.data.frame(pc_cor_df)
+colnames(pc_cor_df)[1]<-"num_pc"
+
+
+
+
+
+pc_cor_df_l <- pc_cor_df%>%pivot_longer(-num_pc, names_to = 'concept', values_to = 'pearson_r')
+mean_pc_cor_df<-pc_cor_df_l%>%group_by(num_pc)%>%summarize(mean_r = mean(pearson_r))
+pc_cor_df_l<- as.data.frame(pc_cor_df_l)
+
+pc_cor_df_grouped<-pc_cor_df_l%>%group_by(num_pc, concept)%>%summarize(mean_r = mean(pearson_r), se = (sd(pearson_r)/sqrt(n())))
+
+
+p<-ggplot(pc_cor_df_grouped, aes(x=num_pc, y=mean_r, color= concept))+
+  #geom_line()+
+  theme_classic()+
+  #geom_ribbon(aes(ymin=mean_r-se,ymax=mean_r+se),alpha=0.3)+
+  geom_line(data=mean_pc_cor_df, aes(x=num_pc, y= mean_r),size = 1, col='red', linetype='dashed')+
+  geom_line(data=mean_pc_cor_df_, aes(x=num_pc, y= mean_r),size = 1, col='black', linetype='dashed') + 
+  theme(legend.position = 'none',axis.text= element_text(size=20),axis.title = element_text(size = 25)) +
+  geom_text( aes( x=5, y=0.9, label="unshuffled"),  color="black", size=4.5 , angle=45)+
+  labs(x='Number of components', y='Correlation', size=50)+
+  geom_vline(xintercept = 8)
+
+p
+ggsave( '../plots/shufVunshuf_fixed.pdf',plot=p,device = 'pdf',width = 10,height = 7)
+
+```
+
+```{r}
+mean_pc_cor_df
+```
+
+
+
+```{r}
+color_dict_df
+color_dict<-as.character(color_dict_df$hex)
+names(color_dict)<- color_dict_df$index
+```
+
+
+```{r}
+
+
+all_sd_recon<-{}
+sd_intervals<-c(-2,-1,0,1,2)
+pc_obj <- prcomp(ratings_mat[,-1],center = T, scale=F)
+for(this_comp in 1:8){
+for(this_sd in sd_intervals){
+recon_ratings<- reverse_pca(n_comp=this_comp,pca_object = pc_obj, explore = T, num_sd=this_sd, vmax=F)
+recon_ratings<-recon_ratings[-1]
+write.csv(recon_ratings,paste0('../data/recon_',this_comp,'_',this_sd,'.csv'),col.names = F, row.names = F)
+
+recon_ratings_long<-recon_ratings%>%pivot_longer(cols = colnames(recon_ratings), names_to = 'color_index', values_to = 'mean_rating')
+recon_ratings_long$color_index<- as.integer(recon_ratings_long$color_index)
+#recon_ratings_long$color_index<- factor(recon_ratings_long$color_index, levels = seq(1:58))
+
+recon_ratings_long$num_sd<- this_sd
+recon_ratings_long$num_comp<- this_comp
+#print(recon_ratings_long)
+#b$color_index<- factor(b$color_index, levels = seq(1:58))
+p<-ggplot(recon_ratings_long, aes(x = reorder(color_index, -mean_rating),y=mean_rating, fill = as.character(color_index)))+
+  geom_bar(stat='identity',colour="black",width = 1, show.legend = FALSE) +
+  scale_fill_manual(values=color_dict) +
+  labs(title=paste(this_sd), y='reconstructed rating')+
+  theme_classic() +
+  ylim(c(-1,1))+
+  theme(axis.ticks.x=element_blank(),axis.text.x=element_blank(),axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"), strip.text = element_text(size=20,face="bold"),plot.title = element_text(hjust = 0.5) )
+all_sd_recon<- rbind(all_sd_recon,recon_ratings_long)
+
+#ggsave(paste0('../plots/recon_ratings_1pc_',this_sd,'sd.png'),
+#  plot = last_plot(),
+#  device = "png",
+#  dpi = 300,
+#  limitsize = TRUE)
+
+}}
+
+
+```
+
+```{r}
+
+recon_plot<- ggplot(all_sd_recon, aes(reorder_within(color_index,-mean_rating,list(num_sd, num_comp)) ,mean_rating, fill = as.character(color_index)))+
+  geom_bar(stat='identity',width = 1, show.legend = FALSE) +
+  scale_fill_manual(values=color_dict) +
+  labs(title='Reconstructed Association Ratings', y='reconstructed rating',x="")+
+  theme_classic() +
+  ylim(c(-2,2))+
+  theme(axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text=element_text(size=20, color='white'), 
+        axis.title=element_text(size=20,face="bold", color = 'white'), 
+        strip.text = element_text(size=20,face="bold"),
+        plot.title = element_text(hjust = 0.5),strip.background = element_blank(),
+  strip.text.x = element_blank(),
+  panel.background = element_rect(fill = "#595959",
+                                colour = "#595959",
+                                size = 0.5, linetype = "solid"),
+  plot.background = element_rect(fill="#595959"))+ 
+  facet_wrap(num_sd~num_comp,scales="free_x",nrow = 5,ncol = 8)+
+  scale_x_reordered() 
+
+print(recon_plot)
+
+
+
+
+```
+
+
+```{r}
+
+recon_plot<- ggplot(all_sd_recon, aes(reorder_within(color_index,-mean_rating,list(num_sd, num_comp)) ,mean_rating, fill = as.character(color_index)))+
+  geom_bar(stat='identity',width = 1, show.legend = FALSE) +
+  scale_fill_manual(values=color_dict) +
+  labs(title='Reconstructed Association Ratings', y='reconstructed rating',x="")+
+  theme_classic() +
+  ylim(c(-2,2))+
+  theme(axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text=element_text(size=20, color='white'), 
+        axis.title=element_text(size=20,face="bold", color = 'white'), 
+        strip.text = element_text(size=20,face="bold"),
+        plot.title = element_text(hjust = 0.5),strip.background = element_blank(),
+  strip.text.x = element_blank(),
+  panel.background = element_rect(fill = "#595959",
+                                colour = "#595959",
+                                size = 0.5, linetype = "solid"),
+  plot.background = element_rect(fill="#595959"))+ 
+  facet_wrap(num_sd~num_comp,scales="free_x",nrow = 5,ncol = 8)+
+  scale_x_reordered() 
+
+print(recon_plot)
+
+
+
+```
+
+
+
+
+```{r}
+#ggsave( paste0('../plots/recon_plot_test2.pdf'), plot = recon_plot, device = "pdf",scale = 1, width = 22, height = 15, dpi = 150, limitsize = TRUE )
+```
+
+
+
+
+```{r}
+pca_obj_rotated <- psych::principal(ratings_mat[,-1], nfactors = 30 ,rotate="varimax", scores=TRUE)
+```
+
+
+```{r}
+
+reg_pred<- read.csv('../data/regression_predictions.csv', header = F)
+
+colnames(reg_pred) <- seq(1:58)
+
+reg_pred<-cbind(reg_pred, seq(1:8))
+colnames(reg_pred)[59]<- "num_comp"
+
+reg_pred
+
+reg_pred<-reg_pred%>%pivot_longer(1:58, names_to = "color_index", values_to = "rating")
+reg_pred
+
+color_dict
+recon_plot<- ggplot(reg_pred, aes(reorder_within(color_index,-rating, num_comp) ,rating, fill = as.character(color_index)))+
+  geom_bar(stat='identity',width = 1, show.legend = FALSE) +
+  scale_fill_manual(values=color_dict) +
+  labs(title='Reconstructed Association Ratings', y='reconstructed rating',x="")+
+  theme_classic() +
+  ylim(c(-2,2))+
+  theme(axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text=element_text(size=20, color='white'), 
+        axis.title=element_text(size=20,face="bold", color = 'white'), 
+        strip.text = element_text(size=20,face="bold"),
+        plot.title = element_text(hjust = 0.5),strip.background = element_blank(),
+  strip.text.x = element_blank(),
+  panel.background = element_rect(fill = "#595959",
+                                colour = "#595959",
+                                size = 0.5, linetype = "solid"),
+  plot.background = element_rect(fill="#595959"))+ 
+  facet_wrap(~num_comp,scales="free_x",nrow = 1,ncol = 8)+scale_x_reordered() 
+
+print(recon_plot)
+```
+
+```{r}
+reg_pred
+
+```
+
+```{r}
+ggsave(
+  paste0('../plots/regression_pred.pdf'),
+  plot = recon_plot,
+  device = "pdf",
+  scale = 1,
+  width = 25,
+  height = 6,
+  dpi = 150,
+  limitsize = TRUE
+)
+
+
+```
+
+
+```{r}
+
+all_sd_recon_s <- all_sd_recon%>%filter(num_sd ==2)
+
+recon_plot<- ggplot(all_sd_recon_s, aes(reorder_within(color_index,-mean_rating, num_comp) ,mean_rating, fill = as.character(color_index)))+
+  geom_bar(stat='identity',width = 1, show.legend = FALSE) +
+  scale_fill_manual(values=color_dict) +
+  labs(title='Reconstructed Association Ratings', y='reconstructed rating',x="")+
+  theme_classic() +
+  ylim(c(-2,2))+
+  theme(axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text=element_text(size=20, color='white'), 
+        axis.title=element_text(size=20,face="bold", color = 'white'), 
+        strip.text = element_text(size=20,face="bold"),
+        plot.title = element_text(hjust = 0.5),strip.background = element_blank(),
+  strip.text.x = element_blank(),
+  panel.background = element_rect(fill = "#595959",
+                                colour = "#595959",
+                                size = 0.5, linetype = "solid"),
+  plot.background = element_rect(fill="#595959"))+ 
+  facet_wrap(~num_comp,scales="free_x",nrow = 1,ncol = 8)+
+  scale_x_reordered() 
+
+print(recon_plot)
+
+
+
+
+```
+
+```{r}
+ggsave(
+  paste0('../plots/recon_plot_-2.pdf'),
+  plot = recon_plot,
+  device = "pdf",
+  scale = 1,
+  width = 25,
+  height = 6,
+  dpi = 150,
+  limitsize = TRUE
+)
+```
+
+
+
+
+```{r}
+ratings_mat_sub<- ratings_mat[-1,]
+pcaobj<- prcomp(ratings_mat_sub[,-1], retx=T, center = T, scale. = F)
+
+proj<-as.matrix(ratings_mat[1,-1])%*%as.matrix(pcaobj$rotation[,1:8])
+
+proj%*%t(pcaobj$rotation[,1:8])
+```
+
+
+
+
+```{r}
+cor_values={}
+concept_names={}
+for(i in 1:30){
+  ## remove one concept from matrix
+  ratings_mat_sub<-ratings_mat[-i,]
+  concept_name <- as.character(ratings_mat[i,1])
+  
+  ## do pca on subset
+  sub_pcaobj<- prcomp(ratings_mat_sub[,-1], retx=T, center = T, scale. = F)
+  
+  ## find the position of held out concept in pca space for first 8 PCs
+  
+  proj<-as.matrix(ratings_mat[i,-1])%*%as.matrix(sub_pcaobj$rotation[,1:8])
+  
+  
+  ## reconstruct held out concept ratings
+  recon<-proj%*%t(sub_pcaobj$rotation[,1:8])
+   if(all(sub_pcaobj$center != FALSE)){
+    ## Remove any mean centering by adding the subtracted mean back in
+    recon <- scale(recon, scale = FALSE, center = -1 * sub_pcaobj$center)
+  }
+  
+  this_cor<-cor(as.numeric(recon),as.numeric(ratings_mat[i,-1]))
+  cor_values= rbind(cor_values,this_cor)
+  concept_names = rbind(concept_names, concept_name)
+
+  
+  
+}
+recon_cors<- as.data.frame(cbind(concept_names, cor_values))
+recon_cors
+rownames(recon_cors)<-{}
+colnames(recon_cors)<-c('concept','r2')
+recon_cors$r2<-as.numeric(as.character(recon_cors$r2))
+
+ggplot(recon_cors, aes(x=concept, y=r2))+ geom_bar(stat='identity') +ylim(c(0,1))+ theme_classic()+theme(axis.text.x = element_text(angle = 50, vjust= 0.7))+ggtitle('Correlation between 8 rank reconstruction and original')
+
+
+mean(recon_cors$r2)
+```
+
+
+
+
+```{r}
+no_dir_rm<-ratings_mat%>%filter(X!=c('above','below', 'beside','near','far'))
+
+
+cor_values={}
+concept_names={}
+for(i in 1:30){
+  concept_name <- as.character(ratings_mat[i,1])
+  ## do pca on subset
+  sub_pcaobj<- prcomp(no_dir_rm[,-1], retx=T, center = T, scale. = F)
+  
+  ## find the position of held out concept in pca space for first 8 PCs
+  
+  proj<-as.matrix(ratings_mat[i,-1])%*%as.matrix(sub_pcaobj$rotation[,1:8])
+  
+  ## reconstruct held out concept ratings
+   recon<-proj%*%t(sub_pcaobj$rotation[,1:8])
+  
+  if(all(sub_pcaobj$center != FALSE)){
+    ## Remove any mean centering by adding the subtracted mean back in
+    recon <- scale(recon, scale = FALSE, center = -1 * sub_pcaobj$center)
+  }
+ 
+  this_cor<-cor(as.numeric(recon),as.numeric(ratings_mat[i,-1]))
+  cor_values= rbind(cor_values,this_cor)
+  concept_names = rbind(concept_names, concept_name)
+}
+
+recon_cors<- as.data.frame(cbind(concept_names, cor_values))
+rownames(recon_cors)<-{}
+colnames(recon_cors)<-c('concept','r2')
+recon_cors$r2<-as.numeric(as.character(recon_cors$r2))
+
+ggplot(recon_cors, aes(x=concept, y=r2))+ geom_bar(stat='identity') +ylim(c(0,1))+ theme_classic()+theme(axis.text.x = element_text(angle = 50, vjust= 0.7))+ggtitle('Correlation between 8 rank reconstruction and original')
+```
+
+
+```{r}
+### Do an SVD of the color concept matrix
+really_run=T
+ratings_mat_c<-ratings_mat
+col_means=numeric()
+if(really_run==T){
+for(i in 1:ncol(ratings_mat[,-1])){
+  col_means<- rbind(col_means,mean(ratings_mat[,1+i]))
+ ratings_mat_c[,1+i]<- ratings_mat[,1+i]-mean(ratings_mat[,1+i])
+}}
+
+svdobj<-svd(ratings_mat_c[,-1])
+svals<- matrix(0, nrow=30,ncol = 30)
+diag(svals)<- svdobj$d
+
+#write.csv((svdobj$v%*%svals/sqrt(30-1)), '../data/basis_vecs_scaled.csv') ## write out the right singular values scaled
+
+### May 2021 Fix (?)
+write.csv((svdobj$v), '../data/basis_vecs_scaled.csv') ## write out the right singular values scaled
+
+
+for(this_concept in concept_list){
+  ratings_mat_sub <- ratings_mat_c[ratings_mat_c[,1]!=this_concept,-1]
+  svdobj_sub<-svd(ratings_mat_sub)
+  svals_sub<- matrix(0, nrow=29,ncol = 29)
+  diag(svals_sub)<- svdobj_sub$d
+#  write.csv((svdobj_sub$v%*%svals_sub/sqrt(29-1)), paste0('../data/basis_vecs_scaled_',this_concept,'.csv')) ## write out the right singular     values scaled
+  
+### May 2021 Fix (?)
+write.csv((svdobj_sub$v), paste0('../data/basis_vecs_scaled_',this_concept,'.csv')) ## write out the right singular values scaled
+
+}
+
+
+
+for(this_color in 1:58){
+  ratings_mat_sub <- ratings_mat_c[,-c(1,this_color+1)]
+  svdobj_sub<-svd(ratings_mat_sub)
+  svals_sub<- matrix(0, nrow=30,ncol = 30)
+  diag(svals_sub)<- svdobj_sub$d
+ # write.csv((svdobj_sub$v%*%svals_sub/sqrt(30-1)), paste0('../data/basis_vecs_scaled_color_',this_color,'.csv')) ## write out the right singular values scaled
+  
+### May 2021 Fix (?)
+ write.csv((svdobj_sub$v), paste0('../data/basis_vecs_scaled_color_',this_color,'.csv')) ## write out the right singular values scaled
+ write.csv(svdobj_sub$u%*%svals_sub[,1:8], paste0('../data/left_8_vec_color_',this_color,'.csv'))
+}
+
+#write.csv(svdobj$v, '../data/basis_vecs.csv') ## write out the right singular values
+write.csv(col_means, '../data/col_means.csv') ## write out the column means
+
+
+
+### Extract the first 8 left singular vectors
+rank8_basis<-svdobj$u[,1:8]
+rank30_basis<-svdobj$u
+
+color_by_basis = matrix(0, 8, 58)
+
+for(i in 1:8){
+  for(j in 1:58){
+  
+    ## +1 because of dummy col 1
+    color_by_basis[i,j] = cor(rank8_basis[,i],ratings_mat[,j+1])
+  }
+}
+color_by_basis
+
+color_dict_df$hex<- as.character(color_dict_df$hex)
+color_dict_df
+
+pal<-ggplot(color_dict_df, aes(x=factor(index), y=10, fill = factor(index)))+ geom_bar(stat='identity')+theme(axis.text.x = element_text(angle = 90, vjust= 0.7), legend.position = "none")+ scale_fill_manual(values=color_dict)
+
+pal
+
+
+
+
+```
+
+1  7  8 12 14 19 27 28 31 33 38 46 53
+
+```{r}
+
+color_by_basis
+best_colors = numeric()
+
+for( i in 1:nrow(color_by_basis)){
+  
+  this_prof = color_by_basis[i,]
+  col_ind = which(abs(this_prof) == max(abs(this_prof)))
+  col_min =  which(abs(this_prof) == min(abs(this_prof)))
+  col_ind2 = which(abs(this_prof) ==sort(abs(this_prof),decreasing=T)[2])
+  col_ind3 = which(abs(this_prof) ==sort(abs(this_prof),decreasing=T)[3])
+  col_ind4 = which(abs(this_prof) ==sort(abs(this_prof),decreasing=T)[4])
+  col_ind5 = which(abs(this_prof) ==sort(abs(this_prof),decreasing=T)[5])
+  
+  best_colors = rbind(best_colors,cbind(col_ind, col_ind2))
+  #best_colors = rbind(best_colors,col_ind)
+}
+
+unique(sort(best_colors))
+#hilocols = c(1,  7,  8, 12, 14, 19, 27, 28, 31, 33, 38, 46, 53)
+hi2cols = c( 1, 3, 4, 14, 23, 24, 27, 28, 33, 37, 50, 54, 56, 58)
+color_dict_df_sub = color_dict_df%>%filter(index %in% hi2cols)
+
+pal_sub<-ggplot(color_dict_df_sub, aes(x=fct_relevel(factor(index)), y=10, fill = factor(index)))+ geom_bar(stat='identity')+ scale_fill_manual(values=color_dict)+ theme_classic()+theme(axis.text.x = element_text(angle = 90, vjust= 0.7), legend.position = "none",panel.background  = element_rect(fill="#595959"))
+
+pal_sub
+  length(unique(best_colors))
+```
+
+
+
+
+
+
+
+
+
+
